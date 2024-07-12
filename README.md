@@ -28,7 +28,7 @@ NextFlow pipeline
 [license-shield]: https://img.shields.io/github/license/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
 [license-url]: https://github.com/jimmlucas/DIvergenceTimes/blob/master/LICENSE.txt
 
-##Reference:
+## Reference:
 [In Silico Evaluation of Variant Calling Methods for Bacterial Whole-Genome Sequencing Assays](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10446864/)
 
 
