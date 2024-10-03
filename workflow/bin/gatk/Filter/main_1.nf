@@ -1,5 +1,5 @@
 process FILTER_VARIANTS {
-    tag "Filter Variant ${type}"
+    tag "Filter Variant ${sample_id}"
     
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".vcf.gz")) "4-finalVCF/VCF/$filename"
@@ -9,12 +9,11 @@ process FILTER_VARIANTS {
     container "$params.gatk4.docker"
 
     input:
-    path(vcf)
+    tuple val (sample_id), path(vcf)
     path(reference)
-    val type
 
     output:
-    path("${type}_filtered_snp_indel.vcf.gz")
+    path("${sample_id}_filtered_snp_indel.vcf.gz")
 
     script:
     def referenceDict = reference.toString().replaceAll('\\.(fna|fa)$', '.dict')
@@ -37,33 +36,33 @@ process FILTER_VARIANTS {
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 25.0 || DP < 30" \\
-        -O ${type}_snps_filtered.vcf.gz
+        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 25.0 || DP < 3" \\
+        -O ${sample_id}_snps_filtered.vcf.gz
 
     # Filtrar Indels
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 25.0 || DP < 30" \\
-        -O ${type}_indels_filtered.vcf.gz
+        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 25.0 || DP < 3" \\
+        -O ${sample_id}_indels_filtered.vcf.gz
 
     # Seleccionar solo variantes que pasen los filtros (etiquetadas como PASS)
     gatk SelectVariants \\
         -R ${reference} \\
-        -V ${type}_snps_filtered.vcf.gz \\
+        -V ${sample_id}_snps_filtered.vcf.gz \\
         --exclude-filtered \\
         --select-type-to-include SNP \\
-        -O ${type}_snps_pass.vcf.gz
+        -O ${sample_id}_snps_pass.vcf.gz
 
     gatk SelectVariants \\
         -R ${reference} \\
-        -V ${type}_indels_filtered.vcf.gz \\
+        -V ${sample_id}_indels_filtered.vcf.gz \\
         --exclude-filtered \\
         --select-type-to-include INDEL \\
-        -O ${type}_indels_pass.vcf.gz
+        -O ${sample_id}_indels_pass.vcf.gz
 
     # Combinar SNPs e indels filtrados en un solo archivo
-    bcftools concat -a -O z -o ${type}_filtered_snp_indel.vcf.gz ${type}_snps_pass.vcf.gz ${type}_indels_pass.vcf.gz
-    bcftools index ${type}_filtered_snp_indel.vcf.gz
+    bcftools concat -a -O z -o ${sample_id}_filtered_snp_indel.vcf.gz ${sample_id}_snps_pass.vcf.gz ${sample_id}_indels_pass.vcf.gz
+    bcftools index ${sample_id}_filtered_snp_indel.vcf.gz
     """
 }

@@ -1,15 +1,14 @@
 process ALIGN {
-    tag "Align Variant ${type}"
+    tag "Align Variant ${sample_id}"
     
     container "$params.gatk4.docker"
 
     input:
-    path(vcf)
+    tuple val (sample_id), path(vcf)
     path(reference)
-    val type
 
     output:
-    path("${type}_aligned.vcf.gz")
+    tuple val (sample_id), path("${sample_id}_aligned.vcf.gz")
 
     script:
     def referenceDict = reference.toString().replaceAll('\\.(fna|fa)$', '.dict')
@@ -31,7 +30,7 @@ process ALIGN {
     gatk LeftAlignAndTrimVariants \
         -R ${reference} \
         -V ${vcf} \
-        -O ${type}_aligned.vcf.gz \
+        -O ${sample_id}_aligned.vcf.gz \
         --split-multi-allelics
     """
 }

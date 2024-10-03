@@ -1,20 +1,19 @@
 process GENOTYPE {
-    tag "genotype ${type}"
+    tag "genotype ${sample_id}"
     
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".vcf.gz")) "4-finalVCF/VCF/$filename"
         else null
     }
     
-    container "$params.gatk4.docker"
+    container "$params.gatk4.docker"  
 
     input:
-    path vcf
-    path reference
-    val type
+    tuple val(sample_id), path(vcf)
+    path(reference)
 
     output:
-    path("final_${type}.vcf.gz")
+    tuple val(sample_id), path("final_${sample_id}.vcf.gz")
 
     script:
     def referenceDict = reference.toString().replaceAll('\\.(fna|fa)$', '.dict')
@@ -38,11 +37,11 @@ process GENOTYPE {
     gatk GenotypeGVCFs \
         -R ${reference} \
         -V ${vcf} \
-        -O final_${type}.vcf.gz \
+        -O final_${sample_id}.vcf.gz \
         --max-alternate-alleles 6 \
         --allow-old-rms-mapping-quality-annotation-data false
 
     # Index the output VCF file
-    tabix -f -p vcf final_${type}.vcf.gz
+    tabix -f -p vcf final_${sample_id}.vcf.gz
     """
 }

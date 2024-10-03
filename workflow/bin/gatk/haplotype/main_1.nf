@@ -8,7 +8,7 @@ process HAPLOTYPECALLER {
     path(reference)
 
     output:
-    path("${sample_id}.g.vcf.gz")
+    tuple val (sample_id), path("${sample_id}.g.vcf.gz")
 
     script:
     def referenceBase = reference.baseName
