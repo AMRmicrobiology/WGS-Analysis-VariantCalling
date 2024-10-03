@@ -31,9 +31,9 @@ git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
 cd WGS-Analysis-VariantCalling
 ```
 Set Up the Environment:
-    Install Nextflow: [Installation Guide](https://github.com/nextflow-io/nextflow)
-    Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support.
-    Ensure Java 8 or higher is installed.
+- Install Nextflow: [Installation Guide](https://github.com/nextflow-io/nextflow)
+- Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support.
+- Ensure Java 8 or higher is installed.
 
 ## Requirements
 
