@@ -24,9 +24,7 @@ include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from './work
 include { BUILD_INDEX_2                                       }     from './workflow/bin/bowtie/index/main_bwa'
 include { TRIMMING                                            }     from './workflow/bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from './workflow/bin/qc/fastqc/main'
-/*
 include { ASSEMBLE                                            }     from './workflow/bin/assemble/main'
-*/
 include { PERSONAL_GENOME_MAPPING                             }     from './workflow/bin/bowtie/mapping/main'
 include { MARKDUPLICATE                                       }     from './workflow/bin/gatk/picard/markduplicate/main'
 include { ADDORREPLACE                                        }     from './workflow/bin/gatk/picard/addorreplace/main'
@@ -41,9 +39,7 @@ workflow {
 //1st Step
 //First Quality-control and build an INDEX - Specie Reference genome
     read_ch = Channel.fromFilePairs(params.input, size: 2 )
-/*
     fastqc_ch_original= FASTQC_QUALITY_ORIGINAL(read_ch.map{it -> it[1]})
-*/
 
 //Pruning (Bowtie2 index + Trimming)
     //Trimming-Reads - Cleaning paired reads and trimming adapters
@@ -52,13 +48,13 @@ workflow {
     personal_ref_ch = Channel.fromPath( [ "$params.personal_ref" ] )
     personal_index_ch  = PERSONAL_GENOME_INDEX (personal_ref_ch)
     personal_index_bwa_ch = BUILD_INDEX_2 (params.personal_ref)
-/*
+
     //Final Quality control after trimming
     FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
 
 // DE NOVO ASSEMBLE
     assemble_denovo_ch = ASSEMBLE(trimmed_read_ch.trimmed_reads)
-*/
+
 //2nd Step
 //mapping process- Mapping used Specie ref. genome, include samtools sorted
     specie_mapping_ch   = PERSONAL_GENOME_MAPPING(trimmed_read_ch.trimmed_reads, params.index_genome_personal)
