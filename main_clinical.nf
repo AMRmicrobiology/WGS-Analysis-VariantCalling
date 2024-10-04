@@ -9,7 +9,7 @@ reference         = file("${params.reference}")
 
 log.info """\
 
-WGS - N F   P I P E L I N E
+WGS - N F   P I P E L I N E - C L I N I C A L 
 ==============================================
 Configuration environemnt:
     Out directory:             $params.outdir
