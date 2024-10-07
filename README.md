@@ -40,12 +40,19 @@ The pipeline includes the following steps:
 
 ### Process to indentify and filter variants:
 5.1.  Anotation using [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta)
+
 5.2 . Variant Identification: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](), [GATK](https://github.com/broadinstitute/gatk) or [FreeBayes](https://github.com/freebayes/freebayes).
+
 5.3. Variant Filtering: Application of quality filters to obtain high-confidence variant calls.
+
 6. Post-Alignment Analysis:
+
   6.1. Genetic variant annotation usign [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
+
   6.2. Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+
   6.3. Identification of acquired antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+  
   6.4. Predict of Antibiotic Resistance Genes using [DeeoARG](https://github.com/gaarangoa/deeparg).
 
 ## Requirements
