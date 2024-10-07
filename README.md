@@ -76,7 +76,7 @@ CLINICAL
 nextflow run main.nf --mode clinical --input '/path/to/data/*.fastq.gz' --outdir './out' -profile docker
 ```
 
-REFERENCE
+REFERENCE STRAIN
 
 ```
 nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --personal_ref '/path/to/bacterial_genome.fasta' --outdir './out' -profile docker
