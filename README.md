@@ -52,7 +52,9 @@ The pipeline includes the following steps:
 
   6.3. Identification of acquired antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
 
-  6.4. Predict of Antibiotic Resistance Genes using [DeeoARG](https://github.com/gaarangoa/deeparg).
+  6.4. Predict of Antibiotic Resistance Genes using [DeepARG](https://github.com/gaarangoa/deeparg).
+
+  6.5. 
 
 ## Requirements
 Set Up the Environment:
