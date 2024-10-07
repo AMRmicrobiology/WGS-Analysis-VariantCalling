@@ -20,25 +20,33 @@ This repository hosts an advanced pipeline developed with Nextflow for whole-gen
 ## Process:
 The pipeline includes the following steps:
 
-1. Quality Control: Assessment of raw sequencing data using FastQC to evaluate read quality. Removal of low-quality bases and adapter sequences with Trimmomatic.
+### Quality COntrol (Q.C)
 
-### De novo
+1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic).
 
-2. de novo assamble [spades]()
-3. Q.Control [QUAST](https://bioinf.spbau.ru/quast)
-4. Furthermore anotation [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta)
-5. Alignment [BWA]()
-6. Post-Alignment
-  6.1. QUAST 
-  6.2. 
+### de-novo
 
-### Reference genome
+2. de novo assembly using [spades]().
+3. Assembly evaluation with [QUAST](https://bioinf.spbau.ru/quast), structural quality metrics of the assembly and [BUSCO](https://github.com/metashot/busco), evaluation of biological completeness.
+4. Alignment using [BWA](https://github.com/bwa-mem2/bwa-mem2).
 
-3. Alignment using BWA-MEM.
-4. Post-Alignment Processing
-5. Variant Calling: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using GATK or FreeBayes.
-6. Variant Filtering: Application of quality filters to obtain high-confidence variant calls.
-7. Annotation: Functional annotation of variants with SnpEff to predict their impact on genes and proteins.
+
+### reference genome
+
+2. Alignment using [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), [samtools](https://github.com/samtools/samtools) 
+3. Q.Control
+4. [MultiQC](https://github.com/MultiQC/MultiQC)
+
+
+### Process to indentify and filter variants:
+5.1.  Anotation using [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta)
+5.2 . Variant Identification: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](), [GATK](https://github.com/broadinstitute/gatk) or [FreeBayes](https://github.com/freebayes/freebayes).
+5.3. Variant Filtering: Application of quality filters to obtain high-confidence variant calls.
+6. Post-Alignment Analysis:
+  6.1. Genetic variant annotation usign [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
+  6.2. Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+  6.3. Identification of acquired antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+  6.4. Predict of Antibiotic Resistance Genes using [DeeoARG](https://github.com/gaarangoa/deeparg).
 
 ## Requirements
 Set Up the Environment:
