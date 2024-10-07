@@ -34,7 +34,7 @@ The pipeline includes the following steps:
 ### reference genome
 
 2. Alignment using [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), [samtools](https://github.com/samtools/samtools) 
-3. Q.Control
+3. Q. Control
 4. [MultiQC](https://github.com/MultiQC/MultiQC)
 
 
