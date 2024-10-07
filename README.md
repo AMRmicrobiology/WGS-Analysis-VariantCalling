@@ -20,7 +20,7 @@ This repository hosts an advanced pipeline developed with Nextflow for whole-gen
 ## Process:
 The pipeline includes the following steps:
 
-### Quality COntrol (Q.C)
+### Quality COntrol (Q.C.)
 
 1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic).
 
