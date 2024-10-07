@@ -29,8 +29,8 @@ The pipeline includes the following steps:
 4. Furthermore anotation [Prokka](https://github.com/tseemann/prokka), [Bakta](https://github.com/oschwengers/bakta)
 5. Alignment [BWA]()
 6. Post-Alignment
-  - 6.1. QUAST 
-  - 6.2. 
+  6.1. QUAST 
+  6.2. 
 
 ### Reference genome
 
@@ -65,7 +65,7 @@ nextflow run main.nf --mode clinical --input '/path/to/data/*.fastq.gz' --outdir
 REFERENCE
 
 ```
-nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --genome '/path/to/bacterial_genome.fasta' --outdir './out' -profile docker
+nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --personal_ref '/path/to/bacterial_genome.fasta' --outdir './out' -profile docker
 ```
 
 ### Parameters
