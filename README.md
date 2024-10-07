@@ -44,7 +44,6 @@ The pipeline includes the following steps:
   5.2 . Variant Identification: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](), [GATK](https://github.com/broadinstitute/gatk) or [FreeBayes](https://github.com/freebayes/freebayes).
 
   5.3. Variant Filtering: Application of quality filters to obtain high-confidence variant calls.
-
 6. Post-Alignment Analysis:
 
   6.1. Genetic variant annotation usign [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
