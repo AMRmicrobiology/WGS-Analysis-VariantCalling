@@ -10,7 +10,7 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 
 ## Contents
 - [Installation](#installation)
-- [Pipeline summary](#pipelinesummary)
+- [Pipeline summary](#pipeline-summary)
     - [de-novo](#de-novo)
     - [refence-genome](#reference-genome)
 - [Requirements](#requirements)
