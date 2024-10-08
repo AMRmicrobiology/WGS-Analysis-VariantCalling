@@ -20,8 +20,6 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 ## Pipeline summary:
 The pipeline includes the following steps:
 
-### Quality Control (QC)
-
 1. **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp).
 
 From this point, the pipeline differs depending on the dataset you are working with. You can perform the variant calling on [*de novo*](#de-novo) assembled strains with your own assembled reference or you might use an already available [reference genome](#reference-genome) to do the variant calling.
