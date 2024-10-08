@@ -78,9 +78,8 @@ cd WGS-Analysis-VariantCalling
 Run the pipeline using the following command, adjusting the parameters as needed:
 
 *DE NOVO*
-<!-- Be aware change clinical for de_novo -->
 ```
-nextflow run main.nf --mode clinical --input '/path/to/data/*.fastq.gz' --outdir './out' -profile <docker/singularity/local>
+nextflow run main.nf --mode de_novo --input '/path/to/data/*.fastq.gz' --outdir './out' -profile <docker/singularity/local>
 ```
 
 *REFERENCE GENOME*

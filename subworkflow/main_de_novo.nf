@@ -32,7 +32,11 @@ include { HAPLOTYPECALLER                                     }     from './work
 include { GENOTYPE as GENOTYPE_WILDTYPE                       }     from './workflow/bin/gatk/genotype/main_1'
 include { ALIGN as NORMALICE_WILDTYPE                         }     from './workflow/bin/gatk/Filter/Align_1'
 include { FILTER_VARIANTS as FILTER_VARIANTS_WILDTYPE         }     from './workflow/bin/gatk/Filter/main_1'
- 
+include { ANOTATIONS as ANOTATION_SNPEFF                      }     from './workflow/bin/snpeff/main'
+include { AMR as POST-ANALYSIS-ABRICATE                       }     from './workflow/bin/AMR/ABRIcate/main'
+include { AMR_2 as POST-ANALYSIS-AMRFINDER                    }     from './workflow/bin/AMR/AMRFinder/main'
+include { AMR_3 as POST-ANALYSIS-DEEPARG                      }     from './workflow/bin/AMR/DeepARG/main'
+
 
 workflow {
 
@@ -99,6 +103,11 @@ workflow {
 
 
     varaiant_filter_ch = FILTER_VARIANTS_WILDTYPE (aligns_and_normalized_ch, params.personal_ref)
+
+//Genetic Variant annotation
+//SNPEFF
+
+    snpeff_anotation_ch = ANOTATION_SNPEFF (varaiant_filter_ch)
 
 }
 

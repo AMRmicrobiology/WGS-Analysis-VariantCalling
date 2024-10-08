@@ -22,10 +22,10 @@ Configuration environment:
 
 // Modo selecction of workflow
 if (params.mode == 'clinical') {
-    include { workflow_clinical } from './subworkflow/clinical' 
+    include { workflow_clinical } from './subworkflow/main_de_novo' 
     workflow_clinical()
 } else if (params.mode == 'reference') {
-    include { workflow_reference } from './subworkflow/reference'
+    include { workflow_reference } from './subworkflow/main_reference'
     workflow_reference()
 } else {
     error "Invalid mode: ${params.mode}. Please specify 'clinical' or 'reference'."

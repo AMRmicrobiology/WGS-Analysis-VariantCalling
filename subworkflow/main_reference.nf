@@ -40,7 +40,11 @@ include { ALIGN as NORMALICE_WILDTYPE                         }     from './work
 include { FILTER_VARIANTS as FILTER_VARIANTS_CP14             }     from './workflow/bin/gatk/Filter/main'
 include { FILTER_VARIANTS as FILTER_VARIANTS_NET              }     from './workflow/bin/gatk/Filter/main'
 include { FILTER_VARIANTS as FILTER_VARIANTS_WILDTYPE         }     from './workflow/bin/gatk/Filter/main'
- 
+include { ANOTATIONS as ANOTATION_SNPEFF                      }     from './workflow/bin/snpeff/main'
+include { AMR as POST-ANALYSIS-ABRICATE                       }     from './workflow/bin/AMR/ABRIcate/main'
+include { AMR_2 as POST-ANALYSIS-AMRFINDER                    }     from './workflow/bin/AMR/AMRFinder/main'
+include { AMR_3 as POST-ANALYSIS-DEEPARG                      }     from './workflow/bin/AMR/DeepARG/main'
+
 
 workflow {
 
