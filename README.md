@@ -38,13 +38,13 @@ cd WGS-Analysis-VariantCalling
 ## Pipeline summary:
 The pipeline includes the following steps:
 
-### Quality Control (Q.C.)
+### Quality Control (QC)
 
-1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic).
+1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic). ?? Change
 
 ### de-novo
 
-2. de novo assembly using [spades]().
+2. de novo assembly using [spades](https://github.com/ablab/spades).
 3. Assembly evaluation with [QUAST](https://bioinf.spbau.ru/quast), structural quality metrics of the assembly and [BUSCO](https://github.com/metashot/busco), evaluation of biological completeness.
 4. Alignment using [BWA](https://github.com/bwa-mem2/bwa-mem2).
 
