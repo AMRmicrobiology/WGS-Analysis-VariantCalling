@@ -10,7 +10,7 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 
 ## Contents
 - [Installation](#installation)
-- [Process](#process)
+- [Pipeline summary](#pipelinesummary)
     - [de-novo](#de-novo)
     - [refence-genome](#reference-genome)
 - [Requirements](#requirements)
@@ -35,7 +35,7 @@ git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
 cd WGS-Analysis-VariantCalling
 ```
 
-## Process:
+## Pipeline summary:
 The pipeline includes the following steps:
 
 ### Quality Control (Q.C.)
