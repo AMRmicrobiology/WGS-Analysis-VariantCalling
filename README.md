@@ -5,9 +5,11 @@
 [![Issues][issues-shield]][issues-url]
 [![license-shield]][license-url]
 
-This repository hosts an advanced pipeline developed with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for Illumina sequencing data of bacterial genomes. It is designed to provide an automated, reproducible, and scalable solution for processing large-scale genomic data in Clinical microbiology research.
+## Introduction
+This repository hosts an advanced pipeline build with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for Illumina sequencing data of bacterial genomes. It is designed to offer an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
 
-## Table of Contents
+## Contents
+- [Installation](#installation)
 - [Process](#process)
     - [de-novo](#de-novo)
     - [refence-genome](#reference-genome)
@@ -17,10 +19,12 @@ This repository hosts an advanced pipeline developed with Nextflow for whole-gen
 - [Project-Structure]()
 - [References](#reference)
 
+## Installation
+
 ## Process:
 The pipeline includes the following steps:
 
-### Quality COntrol (Q.C.)
+### Quality Control (Q.C.)
 
 1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic).
 
