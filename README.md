@@ -42,14 +42,16 @@ The pipeline includes the following steps:
 
 1. Quality Control: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [Trimmomatic](https://github.com/usadellab/Trimmomatic). ?? Change
 
-### de-novo
+From this point, the pipeline differs depending on the dataset you are working with. You can perform the variant calling on [*de novo*](#de-novo) assembled strains with your own assembled reference or you might use an already available [reference genome](#reference-genome) to do the variant calling
+
+#### *De-novo*
 
 2. de novo assembly using [spades](https://github.com/ablab/spades).
 3. Assembly evaluation with [QUAST](https://bioinf.spbau.ru/quast), structural quality metrics of the assembly and [BUSCO](https://github.com/metashot/busco), evaluation of biological completeness.
 4. Alignment using [BWA](https://github.com/bwa-mem2/bwa-mem2).
 
 
-### reference genome
+#### Reference genome
 
 2. Alignment using [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), [samtools](https://github.com/samtools/samtools) 
 3. Q.Control
