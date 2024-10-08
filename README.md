@@ -20,10 +20,10 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 - [References](#reference)
 
 ## Installation
-Set Up the Environment:
-- Install Nextflow: [Installation Guide](https://github.com/nextflow-io/nextflow)
-- Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support.
-- Ensure Java 8 or higher is installed.
+The prerequisites to run the pipeline are:
+- Install [Nextflow](https://github.com/nextflow-io/nextflow) (>=???)
+- Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support
+- Ensure Java 8 or higher is installed (INstallation??)
 
 ## Process:
 The pipeline includes the following steps:
