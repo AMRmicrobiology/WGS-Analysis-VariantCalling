@@ -25,6 +25,16 @@ The prerequisites to run the pipeline are:
 - Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support
 - Ensure Java 8 or higher is installed (INstallation??)
 
+Clone the Repository:
+
+```
+# Clone the workflow repository
+git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
+
+# Move in it
+cd WGS-Analysis-VariantCalling
+```
+
 ## Process:
 The pipeline includes the following steps:
 
@@ -68,13 +78,6 @@ The pipeline includes the following steps:
 
 
 ## How to use it?
-
-Clone the Repository:
-
-```
-git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
-cd WGS-Analysis-VariantCalling
-```
 Run the pipeline using the following command, adjusting the parameters as needed:
 
 CLINICAL
