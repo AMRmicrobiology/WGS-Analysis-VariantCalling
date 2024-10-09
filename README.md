@@ -22,7 +22,7 @@ The pipeline includes the following steps:
 
 1. **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp).
 
-From this point, the pipeline differs depending on the dataset you are working with. You can perform the variant calling on [*de novo*](#de-novo) assembled strains with your own assembled reference or you might use an already available [reference genome](#reference-genome) to do the variant calling.
+From this point, the pipeline differs depending on the dataset you are working with. You can perform the variant calling using the [*de novo*](#de-novo) assembled reference strains or an already available [reference genome](#reference-genome).
 
 #### *De-novo*
 
