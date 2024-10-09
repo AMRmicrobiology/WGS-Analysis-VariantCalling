@@ -28,7 +28,7 @@ From this point, the pipeline differs depending on the dataset you are working w
 
 2. **Assembly**: *de novo* assembly using [SPAdes](https://github.com/ablab/spades).
 3. **Quality assembly assessment**: Structural quality metrics of the assembly using [QUAST](https://bioinf.spbau.ru/quast) and evaluation of biological completeness with [BUSCO](https://github.com/metashot/busco).
-4. **Alignment**: Alignment against the *de novo* assembled reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2).
+4. **Alignment**: Alignment against the *de novo* assembled reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
 
 #### Reference genome
 
