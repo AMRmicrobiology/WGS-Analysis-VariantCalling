@@ -19,23 +19,25 @@ Configuration environemnt:
     .stripIndent()
 
 //Call all the sub-work
-include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from './workflow/bin/qc/fastqc/main'
-include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from './workflow/bin/bowtie/index/main'
-include { BUILD_INDEX_2                                       }     from './workflow/bin/bowtie/index/main_bwa'
-include { TRIMMING                                            }     from './workflow/bin/trimming/main'
-include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from './workflow/bin/qc/fastqc/main'
-include { ASSEMBLE                                            }     from './workflow/bin/assemble/main'
-include { PERSONAL_GENOME_MAPPING                             }     from './workflow/bin/bowtie/mapping/main'
-include { MARKDUPLICATE                                       }     from './workflow/bin/gatk/picard/markduplicate/main'
-include { ADDORREPLACE                                        }     from './workflow/bin/gatk/picard/addorreplace/main'
-include { HAPLOTYPECALLER                                     }     from './workflow/bin/gatk/haplotype/main_1'
-include { GENOTYPE as GENOTYPE_WILDTYPE                       }     from './workflow/bin/gatk/genotype/main_1'
-include { ALIGN as NORMALICE_WILDTYPE                         }     from './workflow/bin/gatk/Filter/Align_1'
-include { FILTER_VARIANTS as FILTER_VARIANTS_WILDTYPE         }     from './workflow/bin/gatk/Filter/main_1'
-include { ANOTATIONS as ANOTATION_SNPEFF                      }     from './workflow/bin/snpeff/main'
-include { AMR as POST-ANALYSIS-ABRICATE                       }     from './workflow/bin/AMR/ABRIcate/main'
-include { AMR_2 as POST-ANALYSIS-AMRFINDER                    }     from './workflow/bin/AMR/AMRFinder/main'
-include { AMR_3 as POST-ANALYSIS-DEEPARG                      }     from './workflow/bin/AMR/DeepARG/main'
+include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../workflow/bin/qc/fastqc/main'
+include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../workflow/bin/bowtie/index/main'
+include { BUILD_INDEX_2                                       }     from '../workflow/bin/bowtie/index/main_bwa'
+include { TRIMMING                                            }     from '../workflow/bin/trimming/main'
+include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../workflow/bin/qc/fastqc/main'
+include { ASSEMBLE                                            }     from '../workflow/bin/assemble/main'
+include { PROKKA                                              }     from '../workflow/bin/anotations/prokka/main'
+include { PERSONAL_GENOME_MAPPING                             }     from '../workflow/bin/bowtie/mapping/main'
+include { BAKTA                                               }     from '../workflow/bin/anotations/bakta/main'
+include { MARKDUPLICATE                                       }     from '../workflow/bin/gatk/picard/markduplicate/main'
+include { ADDORREPLACE                                        }     from '../workflow/bin/gatk/picard/addorreplace/main'
+include { HAPLOTYPECALLER                                     }     from '../workflow/bin/gatk/haplotype/main_1'
+include { GENOTYPE as GENOTYPE_WILDTYPE                       }     from '../workflow/bin/gatk/genotype/main_1'
+include { ALIGN as NORMALICE_WILDTYPE                         }     from '../workflow/bin/gatk/Filter/Align_1'
+include { FILTER_VARIANTS as FILTER_VARIANTS_WILDTYPE         }     from '../workflow/bin/gatk/Filter/main_1'
+include { ANOTATIONS as ANOTATION_SNPEFF                      }     from '../workflow/bin/snpeff/main'
+include { AMR as POST-ANALYSIS-ABRICATE                       }     from '../workflow/bin/AMR/ABRIcate/main'
+include { AMR_2 as POST-ANALYSIS-AMRFINDER                    }     from '../workflow/bin/AMR/AMRFinder/main'
+include { AMR_3 as POST-ANALYSIS-DEEPARG                      }     from '../workflow/bin/AMR/DeepARG/main'
 
 
 workflow {
@@ -58,6 +60,7 @@ workflow {
 
 // DE NOVO ASSEMBLE
     assemble_denovo_ch = ASSEMBLE(trimmed_read_ch.trimmed_reads)
+    wildtype_only_ch = assemble_denovo_ch.contigs.first { it[0] ==~ /.*1$/ }
 
 //2nd Step
 //mapping process- Mapping used Specie ref. genome, include samtools sorted

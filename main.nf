@@ -1,7 +1,4 @@
-/*
-DSL2 channels
-*/
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 checkInputParams()
 
@@ -20,16 +17,24 @@ Configuration environment:
 """
     .stripIndent()
 
-// Modo selecction of workflow
-if (params.mode == 'clinical') {
-    include { workflow_clinical } from './subworkflow/main_de_novo' 
-    workflow_clinical()
+// Incluir los sub-workflows según el modo seleccionado
+if (params.mode == 'novo') {
+    include { novo } from './subworkflow/novo' 
 } else if (params.mode == 'reference') {
-    include { workflow_reference } from './subworkflow/main_reference'
-    workflow_reference()
+    include { reference } from './subworkflow/reference'
 } else {
-    error "Invalid mode: ${params.mode}. Please specify 'clinical' or 'reference'."
+    error "Invalid mode: ${params.mode}. Please specify 'novo' or 'reference'."
 }
+
+// Definir el workflow principal
+workflow {
+    if (params.mode == 'novo') {
+        novo()  // Llamar al workflow 'novo' que ha sido incluido
+    } else if (params.mode == 'reference') {
+        reference()  // Llamar al workflow 'reference' que ha sido incluido
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS                                                                  //
@@ -45,7 +50,7 @@ def checkInputParams() {
     }
 
     // Check required parameters based on the mode selected
-    if (params.mode == 'clinical') {
+    if (params.mode == 'novo') {
         // In clinical mode, no user-supplied reference is required
         log.info("Using wildtype reference for clinical workflow")
     } else if (params.mode == 'reference') {
