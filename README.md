@@ -20,27 +20,29 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 ## Pipeline summary:
 The pipeline includes the following steps:
 
-1. **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp).
+- **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp) followed again by [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [MultiQC](https://github.com/MultiQC/MultiQC) to summarise the input data.
 
-From this point, the pipeline differs depending on the dataset you are working with. You can perform the variant calling using the [*de novo*](#de-novo) assembled reference strains or an already available [reference genome](#reference-genome).
+At this point, the two modes available in the pipeline differ on the input reference genome. You can perform the variant calling using a [*de novo*](#de-novo) assembled reference strains or an already available [reference genome](#reference-genome). 
 
-#### *De-novo*
+1. #### *De-novo*
 
-2. **Assembly**: *de novo* assembly using [SPAdes](https://github.com/ablab/spades).
-3. **Quality assembly assessment**: Structural quality metrics of the assembly using [QUAST](https://bioinf.spbau.ru/quast) and evaluation of biological completeness with [BUSCO](https://github.com/metashot/busco).
-4. **Alignment**: Alignment against the *de novo* assembled reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
+    - **Assembly**: After quality control as previously described, *de novo* assembly using [SPAdes](https://github.com/ablab/spades).
+    -  **Quality assembly assessment**: Structural quality metrics of the assembly using [QUAST](https://bioinf.spbau.ru/quast) and evaluation of biological completeness with [BUSCO](https://github.com/metashot/busco).
+    -   **Anotation**: Genome anotation using [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
-#### Reference genome
+2. #### Reference genome
+    The pipeline includes an script to download the reference genomes.
 
 2. **Alignment**: Alignment against the reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
 3. **Quality control**: Alignment quality control using [QUAST](https://bioinf.spbau.ru/quast).
 4. **Aggregation of quality reports**: [MultiQC](https://github.com/MultiQC/MultiQC)
 
+4. **Alignment**: Alignment against the *de novo* assembled reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
 From this point, the variant calling is the same for all datasets.
 
 5. **Indentification and variant filtering**:
 
-    1.  **Anotation**: Using [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
+   
 
     2. **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
 
