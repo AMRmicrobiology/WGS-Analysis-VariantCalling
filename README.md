@@ -20,43 +20,40 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 ## Pipeline summary:
 The pipeline includes the following steps:
 
-- **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp) followed again by [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [MultiQC](https://github.com/MultiQC/MultiQC) to summarise the input data.
+1. **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp) followed again by [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [MultiQC](https://github.com/MultiQC/MultiQC) to summarise the input data.
 
 At this point, the two modes available in the pipeline differ on the input reference genome. You can perform the variant calling using a [*de novo*](#de-novo) assembled reference strains or an already available [reference genome](#reference-genome). 
 
-1. #### *De-novo*
+-  #### *De-novo*
 
     - **Assembly**: After quality control as previously described, *de novo* assembly using [SPAdes](https://github.com/ablab/spades).
     -  **Quality assembly assessment**: Structural quality metrics of the assembly using [QUAST](https://bioinf.spbau.ru/quast) and evaluation of biological completeness with [BUSCO](https://github.com/metashot/busco).
     -   **Anotation**: Genome anotation using [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
-2. #### Reference genome
-    The pipeline includes an script to download the reference genomes.
+-  #### Reference genome
+    >The pipeline includes an script to download the reference genome.
+    <!-- Añadir como descargar el genoma con tu script -->
+After inputed the reference genome, the pipeline follows the same steps for both modes:
 
-2. **Alignment**: Alignment against the reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
+2. **Alignment**: Alignment against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
 3. **Quality control**: Alignment quality control using [QUAST](https://bioinf.spbau.ru/quast).
 4. **Aggregation of quality reports**: [MultiQC](https://github.com/MultiQC/MultiQC)
 
-4. **Alignment**: Alignment against the *de novo* assembled reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
-From this point, the variant calling is the same for all datasets.
+5. **Variant calling and filtering**:
 
-5. **Indentification and variant filtering**:
+    -  **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
 
-   
+    -  **Variant Filtering**: Application of quality filters to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
 
-    2. **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
-
-    3. **Variant Filtering**: Application of quality filters to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
-
-6. **Genetic variant annotation**: Using [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
+    -  **Genetic variant annotation**: Using [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
 
 7. **Post-Alignment Analysis**:
     
-    1. Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+    - Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
 
-    2. Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+    -  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
 
-    3. Prediction of Antibiotic Resistance Genes using [DeepARG](https://github.com/gaarangoa/deeparg).
+    - Prediction of Antibiotic Resistance Genes using [DeepARG](https://github.com/gaarangoa/deeparg).
  
 
 ## Installation
