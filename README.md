@@ -122,19 +122,23 @@ nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --person
 
 ##### Trimming
 
---cut_front (15):
+--cut_front: move a sliding window from front (5') to tail, drop the bases in the window if its mean quality < threshold, stop otherwise. Default: 15
 
---cut_tail (20):
+--cut_tail: move a sliding window from tail (3') to front, drop the bases in the window if its mean quality < threshold, stop otherwise. Default: 20
 
---cut_mean_quality (20):
+--cut_mean_quality: the mean quality requirement option shared by cut_front, cut_tail or cut_sliding. Range: 1~36 default: 20
 
---length_required (50):
+--length_required: reads shorter than length_required will be discarded. Default: 50.
 
 ##### Filter
 
---qual_snp ("QUAL < 50.0 || MQ < 25.0 || DP < 30"): gattaka
+--qual_snp ("QUAL < 50.0 || MQ < 25.0 || DP < 30"): One or more expressions used with INFO fields to quality filter SNPs.
 
---qual_indel ("QUAL < 200.0 || MQ < 25.0 || DP < 30"):
+--qual_indel ("QUAL < 200.0 || MQ < 25.0 || DP < 30"): One or more expressions used with INFO fields to quality filter INDELs.
+
+>[!NOTE]
+QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth)
+
 
 
 [contributors-shield]: https://img.shields.io/github/contributors/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
