@@ -32,7 +32,10 @@ At this point, the two modes available in the pipeline differ on the input refer
 
 -  #### Reference genome
     >The pipeline includes an script to download the reference genome.
-    <!-- Añadir como descargar el genoma con tu script -->
+    ```
+    bash ./workflow/bin/download_reads.sh
+    ```
+
 After inputed the reference genome, the pipeline follows the same steps for both modes:
 
 2. **Alignment**: Alignment against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
@@ -71,19 +74,32 @@ git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
 # Move in it
 cd WGS-Analysis-VariantCalling
 ```
-<!-- Añadir local -->
+<!-- compl -->
+### Local (conda)
+
+  ```
+  conda create -n bacteriano -f enviromentWGS.yaml
+  conda activate bacteriano
+  ```
+
+
 
 ## How to use it?
+
+>[!IMPORTANT]
+
+
+
 Run the pipeline using the following command, adjusting the parameters as needed:
 
 *DE NOVO*
 ```
-nextflow run main.nf --mode novo --input '/path/to/data/*.fastq.gz' --outdir './out' -profile <docker/singularity/local>
+nextflow run main.nf --mode novo --input '/path/to/data/*.fastq.gz' --outdir './out' -profile <docker/singularity/conda>
 ```
 
 *REFERENCE GENOME*
 ```
-nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --personal_ref '/path/to/bacterial_genome.fasta' --outdir './out' -profile <docker/singularity/local>
+nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --personal_ref '/path/to/bacterial_genome.fasta' --outdir './out' -profile <docker/singularity/conda>
 ```
 
 ### Parameters
