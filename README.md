@@ -157,6 +157,8 @@ nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --person
 [In Silico Evaluation of Variant Calling Methods for Bacterial Whole-Genome Sequencing Assays](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10446864/)
 
 [Recommendations for clinical interpretation of variants found in non-coding regions of the genome](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9295495/)
+
+[An ANI gap within bacterial species that advances the definitions of intra-species units](https://journals.asm.org/doi/10.1128/mbio.02696-23)
 <!-- ADD REFERENCES -->
 
 
