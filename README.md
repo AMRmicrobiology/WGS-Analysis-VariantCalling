@@ -163,6 +163,8 @@ QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered rea
 [Recommendations for clinical interpretation of variants found in non-coding regions of the genome](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9295495/)
 
 [An ANI gap within bacterial species that advances the definitions of intra-species units](https://journals.asm.org/doi/10.1128/mbio.02696-23)
+
+[Evaluation of serverless computing for scalable execution of a joint variant calling workflow](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0254363)
 <!-- ADD REFERENCES -->
 
 
