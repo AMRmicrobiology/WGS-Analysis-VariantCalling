@@ -1,52 +1,23 @@
 process MULTIQC {
-    label 'process_single'
+
+    tag "Generating MultiQC report"
+    
+    publishDir "${params.qcdir}", mode: 'copy'
 
     input:
-    path  multiqc_files, stageAs: "?/*"
-    path(multiqc_config)
-    path(extra_multiqc_config)
-    path(multiqc_logo)
+    path fastqc_first
+    path fastqc_after
+    tuple val(sample_id), path(quast)
 
     output:
-    path "*multiqc_report.html", emit: report
-    path "*_data"              , emit: data
-    path "*_plots"             , optional:true, emit: plots
-    path "versions.yml"        , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
+    path "multiqc_report"
+    path "multiqc_report_assemble"
 
     script:
 
-    def args = task.ext.args ?: ''
-    def config = multiqc_config ? "--config $multiqc_config" : ''
-    def extra_config = extra_multiqc_config ? "--config $extra_multiqc_config" : ''
-    def logo = multiqc_logo ? /--cl-config 'custom_logo: "${multiqc_logo}"'/ : ''
-    
     """
-    multiqc \\
-        --force \\
-        $args \\
-        $config \\
-        $extra_config \\
-        $logo \\
-        .
+    multiqc ${fastqc_first} ${fastqc_after} -o multiqc_report
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        multiqc: \$( multiqc --version | sed -e "s/multiqc, version //g" )
-    END_VERSIONS
-    """
-
-    stub:
-    """
-    mkdir multiqc_data
-    touch multiqc_plots
-    touch multiqc_report.html
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        multiqc: \$( multiqc --version | sed -e "s/multiqc, version //g" )
-    END_VERSIONS
+    multiqc ${quast} -o multiqc_report_assemble
     """
 }

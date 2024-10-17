@@ -2,13 +2,12 @@
 process FASTQC_QUALITY {
     tag "FASTQC"
 
-    publishDir "${params.qcdir}", mode: 'copy'
-
     input:
     path (reads)
 
     output:
-    path ("*.html")
+    path ("*.html"), emit:qc_html
+    path ("*.zip"), emit: qc_zip
 
     script:
     """

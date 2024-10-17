@@ -36,14 +36,14 @@ process FILTER_VARIANTS {
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 25.0 || DP < 3" \\
+        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 25.0 || DP < 30" \\
         -O ${sample_id}_snps_filtered.vcf.gz
 
     # Filtrar Indels
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 25.0 || DP < 3" \\
+        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 25.0 || DP < 30" \\
         -O ${sample_id}_indels_filtered.vcf.gz
 
     # Seleccionar solo variantes que pasen los filtros (etiquetadas como PASS)
