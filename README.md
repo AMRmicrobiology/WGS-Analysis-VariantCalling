@@ -167,6 +167,8 @@ QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered rea
 [Evaluation of serverless computing for scalable execution of a joint variant calling workflow](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0254363)
 
 [GATK hard filtering: tunable parameters to improve variant calling for next generation sequencing targeted gene panel data](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1537-8#Sec6)
+
+
 <!-- ADD REFERENCES -->
 
 
