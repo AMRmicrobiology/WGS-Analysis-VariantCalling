@@ -8,6 +8,10 @@
 ## Introduction
 This repository hosts an advanced pipeline build with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for Illumina sequencing data of bacterial genomes. It is designed to offer an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
 
+
+![Current pipeline of the project](image-1.png)
+
+
 ## Contents
 - [Pipeline summary](#pipeline-summary)
     - [*de-novo*](#de-novo)
@@ -17,7 +21,7 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
     - [Parameters](#parameters)
 - [References](#reference)
 
-![Current pipeline of the project](image-1.png)
+
 
 ## Pipeline summary:
 The pipeline includes the following steps:
