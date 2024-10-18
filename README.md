@@ -17,7 +17,7 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
     - [Parameters](#parameters)
 - [References](#reference)
 
-![Pipeline]("C:\Users\rdepedro\Downloads\image.png")
+![Current pipeline of the project](image-1.png)
 
 ## Pipeline summary:
 The pipeline includes the following steps:
