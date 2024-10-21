@@ -15,6 +15,8 @@ process PERSONAL_GENOME_MAPPING {
     path("${sample_id}.bam"), path("${sample_id}.bam.bai"),
     path("${sample_id}_bowtie2_metrics.txt"), path("${sample_id}_samtools_flagstat.txt")
     
+    when:
+    file(params.index_genome_personal + ".1.bt2").exists()
     
     script:
     """

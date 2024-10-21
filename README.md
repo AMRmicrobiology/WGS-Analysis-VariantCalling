@@ -124,7 +124,7 @@ nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --person
 
 #### Optional parameters
 
---workDir: Path to the temporary work directory where files will be stored (default: ./work).
+-w: Path to the temporary work directory where files will be stored (default: ./work).
 
 ##### Trimming
 
