@@ -42,7 +42,6 @@ include { DECOMPRESS_VCF                                      }     from '../wor
 include { SNPEFF                                              }     from '../workflow/bin/snpeff/main'
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../workflow/bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../workflow/bin/AMR/AMRFinder/main'
-include { AMR_3 as POST_ANALYSIS_DEEPARG                      }     from '../workflow/bin/AMR/DeepARG/main'
 /*
 
 
