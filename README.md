@@ -143,7 +143,7 @@ nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --person
 --qual_indel: One or more expressions used with INFO fields to quality filter INDELs. Default: "QUAL < 200.0 || MQ < 25.0 || DP < 30".
 
 >[!NOTE]
-QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth)
+QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth). More info [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants).
 
 
 
