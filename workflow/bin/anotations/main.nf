@@ -18,7 +18,6 @@ process AGT {
 
     script:
     """
-
     agat_convert_sp_gxf2gxf.pl --gff ${prokka_file} --output prokka_${sample_id}.gff3
 
     agat_sp_merge_annotations.pl --gff prokka_${sample_id}.gff3 --gff ${bakta_file} --out combined_${sample_id}.gff3

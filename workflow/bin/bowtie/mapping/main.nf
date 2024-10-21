@@ -1,5 +1,5 @@
 process PERSONAL_GENOME_MAPPING {
-    tag "Mapping_personal_ref ${sample_id}"
+    tag "Mapping_personal_ref vs ${sample_id}"
     
     publishDir "${params.outdir}/3-prunning", mode: 'copy',
     saveAs: { filename ->

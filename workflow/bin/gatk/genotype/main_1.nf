@@ -10,7 +10,7 @@ process GENOTYPE {
 
     input:
     tuple val(sample_id), path(vcf)
-    path(reference)
+    tuple val(sample_id), path(reference)
 
     output:
     tuple val(sample_id), path("final_${sample_id}.vcf.gz")

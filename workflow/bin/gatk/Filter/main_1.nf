@@ -10,10 +10,11 @@ process FILTER_VARIANTS {
 
     input:
     tuple val (sample_id), path(vcf)
-    path(reference)
+    tuple val(sample_id), path(reference)
 
     output:
-    path("${sample_id}_filtered_snp_indel.vcf.gz")
+    path("${sample_id}_filtered_snp_indel.vcf.gz"), emit: vcf_gz
+    tuple val (sample_id), path ("${sample_id}_filtered_snp_indel.vcf.gz"), emit : compl_vcf
 
     script:
     def referenceDict = reference.toString().replaceAll('\\.(fna|fa)$', '.dict')
@@ -36,14 +37,14 @@ process FILTER_VARIANTS {
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 25.0 || DP < 30" \\
+        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 40.0 || DP < 30" \\
         -O ${sample_id}_snps_filtered.vcf.gz
 
     # Filtrar Indels
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 25.0 || DP < 30" \\
+        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 40.0 || DP < 30" \\
         -O ${sample_id}_indels_filtered.vcf.gz
 
     # Seleccionar solo variantes que pasen los filtros (etiquetadas como PASS)

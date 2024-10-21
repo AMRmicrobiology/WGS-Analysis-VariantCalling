@@ -5,7 +5,7 @@ process HAPLOTYPECALLER {
 
     input:
     tuple val(sample_id), path(bam)
-    path(reference)
+    tuple val(sample_id), path(reference)
 
     output:
     tuple val (sample_id), path("${sample_id}.g.vcf.gz")
@@ -57,7 +57,7 @@ process HAPLOTYPECALLER {
         -I ${bam} \
         -O ${sample_id}.g.vcf.gz \
         --standard-min-confidence-threshold-for-calling 30 \
-        --minimum-mapping-quality 20 \
+        --minimum-mapping-quality 30 \
         -ERC GVCF
 
     # Verificar que el archivo de salida se haya creado
