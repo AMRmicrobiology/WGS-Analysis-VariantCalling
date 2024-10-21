@@ -16,23 +16,42 @@ process GENOTYPE {
     tuple val(sample_id), path("final_${sample_id}.vcf.gz")
 
     script:
-    def referenceDict = reference.toString().replaceAll('\\.(fna|fa)$', '.dict')
-    
+
+    def referenceBase = reference.baseName
+    def referenceDict = referenceBase + ".dict"
+    def referenceFai = reference + ".fai"
+
     """
-    if [ ! -f ${reference}.fai ]; then
-        echo "Indexing reference fasta"
+    # Verificar o crear el índice de referencia (.fai)
+    echo "Indexing reference ${reference}..."
+    if [ ! -f ${referenceFai} ]; then
         samtools faidx ${reference}
     fi
+
+    # Verificar o crear el diccionario de referencia (.dict)
+    echo "Creating sequence dictionary for ${reference}..."
     if [ ! -f ${referenceDict} ]; then
-        echo "Creating reference dictionary"
         gatk CreateSequenceDictionary -R ${reference} -O ${referenceDict}
     fi
+
+    # Verificar que los archivos de índice y diccionario se hayan creado
+    if [ ! -f ${referenceFai} ]; then
+        echo "Error: The reference index (.fai) was not created." >&2
+        ls -lh ${reference}
+        exit 1
+    fi
+
+    if [ ! -f ${referenceDict} ]; then
+        echo "Error: The reference dictionary (.dict) was not created." >&2
+        ls -lh ${reference}
+        exit 1
+    fi
+
+    # Verificar o crear el índice del archivo VCF
     if [ ! -f ${vcf}.tbi ]; then
-        echo "Indexing vcf file"
+        echo "Indexing VCF file ${vcf}..."
         tabix -p vcf ${vcf}
     fi
-    
-    echo "Running GenotypeGVCFs"
 
     gatk GenotypeGVCFs \
         -R ${reference} \
