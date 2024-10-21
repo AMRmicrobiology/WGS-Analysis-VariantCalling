@@ -22,19 +22,16 @@ process GENOTYPE {
     def referenceFai = reference + ".fai"
 
     """
-    # Verificar o crear el índice de referencia (.fai)
     echo "Indexing reference ${reference}..."
     if [ ! -f ${referenceFai} ]; then
         samtools faidx ${reference}
     fi
 
-    # Verificar o crear el diccionario de referencia (.dict)
     echo "Creating sequence dictionary for ${reference}..."
     if [ ! -f ${referenceDict} ]; then
         gatk CreateSequenceDictionary -R ${reference} -O ${referenceDict}
     fi
 
-    # Verificar que los archivos de índice y diccionario se hayan creado
     if [ ! -f ${referenceFai} ]; then
         echo "Error: The reference index (.fai) was not created." >&2
         ls -lh ${reference}
@@ -47,7 +44,6 @@ process GENOTYPE {
         exit 1
     fi
 
-    # Verificar o crear el índice del archivo VCF
     if [ ! -f ${vcf}.tbi ]; then
         echo "Indexing VCF file ${vcf}..."
         tabix -p vcf ${vcf}
