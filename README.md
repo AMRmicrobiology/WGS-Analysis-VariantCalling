@@ -138,9 +138,9 @@ nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --person
 
 ##### Filter
 
---qual_snp ("QUAL < 50.0 || MQ < 25.0 || DP < 30"): One or more expressions used with INFO fields to quality filter SNPs.
+--qual_snp: One or more expressions used with INFO fields to quality filter SNPs. Default "QUAL < 50.0 || MQ < 25.0 || DP < 30".
 
---qual_indel ("QUAL < 200.0 || MQ < 25.0 || DP < 30"): One or more expressions used with INFO fields to quality filter INDELs.
+--qual_indel: One or more expressions used with INFO fields to quality filter INDELs. Default: "QUAL < 200.0 || MQ < 25.0 || DP < 30".
 
 >[!NOTE]
 QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth)
