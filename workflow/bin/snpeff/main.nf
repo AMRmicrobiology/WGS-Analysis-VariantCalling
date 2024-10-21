@@ -8,7 +8,7 @@ process SNPEFF {
 
     input:
     path gff3_file
-    tuple val(sample_id), path(assembly_file)
+    tuple val(id_reference), path(assembly_file)
     val genome_name_db
     path protein_fasta
     path cds_fasta

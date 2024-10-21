@@ -5,7 +5,7 @@ process HAPLOTYPECALLER {
 
     input:
     tuple val(sample_id), path(bam)
-    tuple val(sample_id), path(reference)
+    tuple val(id_reference), path(reference)
 
     output:
     tuple val (sample_id), path("${sample_id}.g.vcf.gz")
