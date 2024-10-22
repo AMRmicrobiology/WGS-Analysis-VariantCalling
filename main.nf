@@ -19,9 +19,9 @@ Configuration environment:
 
 // Incluir los sub-workflows según el modo seleccionado
 if (params.mode == 'novo') {
-    include { novo } from './subworkflow/novo' 
+    include { novo } from "$projectDir/subworkflow/novo" 
 } else if (params.mode == 'reference') {
-    include { reference } from './subworkflow/reference'
+    include { reference } from "$projectDir/subworkflow/reference"
 } else {
     error "Invalid mode: ${params.mode}. Please specify 'novo' or 'reference'."
 }
