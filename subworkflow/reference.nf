@@ -29,7 +29,7 @@ include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin
 include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
 include { MARKDUPLICATE                                       }     from '../bin/gatk/picard/markduplicate/main'
 include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
-include { HAPLOTYPECALLER                                     }     from '../bin/gatk/haplotype/main'
+include { HAPLOTYPECALLER                                     }     from '../bin/gatk/haplotype/main_1'
 include { GENOTYPE as GENOTYPE_ANALYSIS                       }     from '../bin/gatk/genotype/main'
 include { ALIGN as NORMALICE_WILDTYPE                         }     from '../bin/gatk/Filter/align'
 include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
