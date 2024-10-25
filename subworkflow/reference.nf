@@ -20,21 +20,21 @@ Configuration environemnt:
     .stripIndent()
 
 //Call all the sub-work
-include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../workflow/bin/qc/fastqc/main'
-include { TRIMMING                                            }     from '../workflow/bin/trimming/main'
-include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../workflow/bin/qc/fastqc/main'
-include { MULTIQC                                             }     from '../workflow/bin/qc/multiqc/main_2'
-include { BUILD_INDEX_1                                       }     from '../workflow/bin/bowtie/index/main_bwa'
-include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../workflow/bin/bowtie/index/main'
-include { PERSONAL_GENOME_MAPPING                             }     from '../workflow/bin/bowtie/mapping/main'
-include { MARKDUPLICATE                                       }     from '../workflow/bin/gatk/picard/markduplicate/main'
-include { ADDORREPLACE                                        }     from '../workflow/bin/gatk/picard/addorreplace/main'
-include { HAPLOTYPECALLER                                     }     from '../workflow/bin/gatk/haplotype/main'
-include { GENOTYPE as GENOTYPE_ANALYSIS                       }     from '../workflow/bin/gatk/genotype/main'
-include { ALIGN as NORMALICE_WILDTYPE                         }     from '../workflow/bin/gatk/Filter/align'
-include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../workflow/bin/gatk/Filter/main'
+include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
+include { TRIMMING                                            }     from '../bin/trimming/main'
+include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
+include { MULTIQC                                             }     from '../bin/qc/multiqc/main_2'
+include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
+include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
+include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
+include { MARKDUPLICATE                                       }     from '../bin/gatk/picard/markduplicate/main'
+include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
+include { HAPLOTYPECALLER                                     }     from '../bin/gatk/haplotype/main'
+include { GENOTYPE as GENOTYPE_ANALYSIS                       }     from '../bin/gatk/genotype/main'
+include { ALIGN as NORMALICE_WILDTYPE                         }     from '../bin/gatk/Filter/align'
+include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
 /*
-include { ANOTATIONS as ANOTATION_SNPEFF                      }     from '../workflow/bin/snpeff/main'
+include { ANOTATIONS as ANOTATION_SNPEFF                      }     from '../bin/snpeff/main'
 */
 
 workflow reference {
