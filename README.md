@@ -152,7 +152,7 @@ QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered rea
 [contributors-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/graphs/contributors
 
 [forks-shield]: https://img.shields.io/github/forks/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
-[forks-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/network/members
+[forks-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/branches
 
 [stars-shield]: https://img.shields.io/github/stars/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
 [stars-url]: https://github.com/gjimmlucas/DIvergenceTimes/stargazers
