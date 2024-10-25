@@ -149,19 +149,19 @@ QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered rea
 
 
 [contributors-shield]: https://img.shields.io/github/contributors/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
-[contributors-url]: https://github.com/jimmlucas/DIvergenceTimes/graphs/contributors
+[contributors-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/graphs/contributors
 
 [forks-shield]: https://img.shields.io/github/forks/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
-[forks-url]: https://github.com/jimmlucas/DIvergenceTimes/network/members
+[forks-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/network/members
 
 [stars-shield]: https://img.shields.io/github/stars/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
 [stars-url]: https://github.com/gjimmlucas/DIvergenceTimes/stargazers
 
 [issues-shield]: https://img.shields.io/github/issues/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
-[issues-url]: https://github.com/jimmlucas/DIvergenceTimes/issues
+[issues-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/issues
 
 [license-shield]: https://img.shields.io/github/license/jimmlucas/DIvergenceTimes.svg?style=for-the-badge
-[license-url]: https://github.com/jimmlucas/DIvergenceTimes/blob/master/LICENSE.txt
+[license-url]: https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling/blob/master/LICENSE.txt
 
 ## Reference:
 
