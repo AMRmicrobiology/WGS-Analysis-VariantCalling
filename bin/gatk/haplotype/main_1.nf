@@ -2,15 +2,16 @@ process HAPLOTYPECALLER {
     tag "Haplotype ${sample_id}"
 
     container "$params.gatk4.docker"
-
+    
     input:
-    tuple val(sample_id), path(bam)
-    tuple val(id_reference), path(reference)
+    tuple val(sample_id), path(bam), val(id_reference), path(reference)
 
     output:
-    tuple val (sample_id), path("${sample_id}.g.vcf.gz")
+    tuple val (sample_id), path("${sample_id}.g.vcf.gz"), emit: out_files
+    tuple val (id_reference), path(reference), emit: reference_personal_genome
 
     script:
+    // Usar el nombre base del archivo de referencia sin extensión
     def referenceBase = reference.baseName
     def referenceDict = referenceBase + ".dict"
     def referenceFai = reference + ".fai"
@@ -26,7 +27,7 @@ process HAPLOTYPECALLER {
         gatk CreateSequenceDictionary -R ${reference} -O ${referenceDict}
     fi
 
-    # Verificar que los archivos se hayan creado
+    # Verificar que los archivos se hayan creado correctamente
     if [ ! -f ${referenceFai} ]; then
         echo "Error: The reference index (.fai) was not created." >&2
         ls -lh ${reference}
@@ -44,7 +45,7 @@ process HAPLOTYPECALLER {
         samtools index ${bam}
     fi
 
-    # Verificar que el archivo BAM esté indexado
+    # Verificar que el archivo BAM esté indexado correctamente
     if [ ! -f ${bam}.bai ]; then
         echo "Error: The BAM index (.bai) was not created." >&2
         exit 1
@@ -60,7 +61,7 @@ process HAPLOTYPECALLER {
         --minimum-mapping-quality 30 \
         -ERC GVCF
 
-    # Verificar que el archivo de salida se haya creado
+    # Verificar que el archivo de salida se haya creado correctamente
     if [ ! -f ${sample_id}.g.vcf.gz ]; then
         echo "Error: The output VCF file (.g.vcf.gz) was not created." >&2
         exit 1

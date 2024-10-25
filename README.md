@@ -37,7 +37,8 @@ At this point, the two modes available in the pipeline differ on the input refer
     -   **Anotation**: Genome anotation using [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
 -  #### Reference genome
-    >The pipeline includes an script to download the reference genome.
+    >The pipeline includes an script to download the reads from DB using an Acc_List.txt
+
     ```
     bash ./workflow/bin/download_reads.sh
     ```
@@ -96,15 +97,15 @@ Run the pipeline using the following command, adjusting the parameters as needed
 
 *DE NOVO*
 >[!IMPORTANT]
-The name of the paired-end reads of the reference sample must be labelled as **1** (e.g. AB**1**_1 / AB**1**_2)
+The name of the paired-end reads of the reference sample must be labelled as **1** (e.g. AB**1**_1.fastq.gz / AB**1**_2.fastq.gz)
 
 ```
-nextflow run main.nf --mode novo --input '/path/to/data/*.fastq.gz' --genome_name_db ¨Acinetobacter_baumanii_clinical¨ --outdir './out' -profile <docker/singularity/conda>
+nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
 ```
 
 *REFERENCE GENOME*
 ```
-nextflow run main.nf --mode refrence --input '/path/to/data/*.fastq.gz' --personal_ref '/path/to/bacterial_genome.fasta' --outdir './out' -profile <docker/singularity/conda>
+nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" --personal_ref "/path/to/bacterial_genome.fasta" -profile <docker/singularity/conda>
 ```
 
 ### Parameters
@@ -173,6 +174,8 @@ QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered rea
 [Evaluation of serverless computing for scalable execution of a joint variant calling workflow](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0254363)
 
 [GATK hard filtering: tunable parameters to improve variant calling for next generation sequencing targeted gene panel data](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1537-8#Sec6)
+
+[Assembling the perfect bacterial genome using oxford nanopore and illumina sequencing](https://pubmed.ncbi.nlm.nih.gov/36862631/)
 
 
 <!-- ADD REFERENCES -->

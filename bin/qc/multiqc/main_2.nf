@@ -1,0 +1,19 @@
+process MULTIQC {
+
+    tag "Generating MultiQC report"
+    
+    publishDir "${params.qcdir}", mode: 'copy'
+
+    input:
+    path fastqc_first
+    path fastqc_after
+
+    output:
+    path "multiqc_report"
+
+    script:
+
+    """
+    multiqc ${fastqc_first} ${fastqc_after} -o multiqc_report
+    """
+}

@@ -11,6 +11,8 @@ process QUAST {
     output:
     tuple val(sample_id), path("quast_result_${sample_id}")
 
+    cache 'deep'
+
     script:
 
     """
