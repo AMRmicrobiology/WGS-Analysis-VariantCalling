@@ -62,8 +62,6 @@ After inputed the reference genome, the pipeline follows the same steps for both
     - Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
 
     -  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
-
-    - Prediction of Antibiotic Resistance Genes using [DeepARG](https://github.com/gaarangoa/deeparg).
  
 
 ## Installation
