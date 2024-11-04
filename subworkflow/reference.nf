@@ -45,21 +45,21 @@ workflow reference {
 workflow workflow_pre_process {
     take:
     main:
-    // Quality control y construcción del índice
+    // Quality control and Index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
     /*
     fastqc_ch_original= FASTQC_QUALITY_ORIGINAL(read_ch.map{it -> it[1]})
     */
-    // Trimming de las lecturas
+    // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
-    /*
+
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
     
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
-    */
+
     //Reference Genome INDEX
     personal_ref_ch = Channel.fromPath(params.personal_ref)
     reference_ch = personal_ref_ch.map {
@@ -133,7 +133,7 @@ workflow workflow_post_process {
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
     varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, gatk_haplotype_ch.reference_personal_genome)
- /*
+    /*
     // Decompress VCF
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
 

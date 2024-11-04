@@ -57,19 +57,19 @@ workflow workflow_pre_process {
 
     take:
     main:
-    // Quality control y construcción del índice
+    // Quality control and index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
 
     fastqc_ch_original= FASTQC_QUALITY_ORIGINAL(read_ch.map{it -> it[1]})
 
-    // Trimming de las lecturas
+    // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
    
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
 
-    // Ensamblado de novo
+    //de novo assemble
     assemble_denovo_ch = ASSEMBLE(trimmed_read_ch.trimmed_reads)
     wildtype_only_ch = assemble_denovo_ch.contigs.first { it[0] ==~ /.*[^0-9]1$/ }
     contigs_ch = assemble_denovo_ch.contigs
@@ -81,7 +81,7 @@ workflow workflow_pre_process {
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect(), quast_ch.collect())
 
-    // Construir un índice del genoma de referencia personal
+    // Index build
     personal_ref_ch = wildtype_only_ch
     personal_index_bwa_ch = BUILD_INDEX_1(personal_ref_ch)
     personal_index_ch = PERSONAL_GENOME_INDEX(personal_ref_ch)
