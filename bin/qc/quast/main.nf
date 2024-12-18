@@ -4,14 +4,11 @@ process QUAST {
     publishDir "${params.outdir}/5-assemble/QUAST", mode: 'copy'
     
     input:
-    tuple val(sample_id), path(contigs)
-    tuple val(sample_id), path(scaffolds)
-    tuple val(pair_id), path(trimmed_reads)
+    tuple val(sample_id), path(contigs), path(scaffolds), path(trimmed_reads)
 
     output:
-    tuple val(sample_id), path("quast_result_${sample_id}")
-
-    cache 'deep'
+    tuple val(sample_id), path("quast_result_${sample_id}/report.tsv"), emit: report_tsv_quast
+    tuple val(sample_id),path("quast_result_${sample_id}/report.txt"), emit: report_txt_quast
 
     script:
 

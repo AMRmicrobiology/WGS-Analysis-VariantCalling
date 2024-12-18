@@ -74,10 +74,15 @@ workflow workflow_pre_process {
     wildtype_only_ch = assemble_denovo_ch.contigs.first { it[0] == params.wiltype_code }
     contigs_ch = assemble_denovo_ch.contigs
     scaffolds_ch = assemble_denovo_ch.scaffolds
-    /*
+    
+    assemble_files_ch = contigs_ch
+                .join(scaffolds_ch)
+                
+    quast_input_ch = assemble_files_ch.join(trimmed_read_ch.trimmed_reads)
+    
     //QUAST
-    quast_ch = QUAST(assemble_denovo_ch.contigs, assemble_denovo_ch.scaffolds, trimmed_read_ch.trimmed_reads )
-    .map { tuple -> tuple[1] } 
+    quast_ch = QUAST(quast_input_ch)
+  /*
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect(), quast_ch.collect())
     */
