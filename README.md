@@ -21,7 +21,7 @@ This repository hosts an advanced pipeline build with Nextflow for whole-genome 
 - [How to Use It](#how-to-use-it)
     - [Parameters](#parameters)
 - [References](#reference)
-
+.
 
 
 ## Pipeline summary:
