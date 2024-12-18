@@ -71,16 +71,16 @@ workflow workflow_pre_process {
 
     //de novo assemble
     assemble_denovo_ch = ASSEMBLE(trimmed_read_ch.trimmed_reads)
-    wildtype_only_ch = assemble_denovo_ch.contigs.first { it[0] ==~ /.*[^0-9]1$/ }
+    wildtype_only_ch = assemble_denovo_ch.contigs.first { it[0] == params.wiltype_code }
     contigs_ch = assemble_denovo_ch.contigs
     scaffolds_ch = assemble_denovo_ch.scaffolds
-
+    /*
     //QUAST
     quast_ch = QUAST(assemble_denovo_ch.contigs, assemble_denovo_ch.scaffolds, trimmed_read_ch.trimmed_reads )
     .map { tuple -> tuple[1] } 
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect(), quast_ch.collect())
-
+    */
     // Index build
     personal_ref_ch = wildtype_only_ch
     personal_index_bwa_ch = BUILD_INDEX_1(personal_ref_ch)
@@ -102,14 +102,17 @@ workflow workflow_post_process {
     main:
     //anotations process
     prokka_anotation_ch = PROKKA(personal_ref_ch)
+
     //anotations BAKTA
     bakta_anotation_ch = BAKTA(personal_ref_ch)
+
     //merge anotations
     agt_ch = AGT(prokka_anotation_ch.prokka_gff, bakta_anotation_ch.bakta_gff3, personal_ref_ch)
 
     //2nd Step
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
+
     //Add groups and Mark duplicates
     bam_ch = specie_mapping_ch.map {
         tupla -> 
