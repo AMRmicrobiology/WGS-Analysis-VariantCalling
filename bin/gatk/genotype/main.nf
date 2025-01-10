@@ -2,7 +2,7 @@ process GENOTYPE {
     tag "genotype ${sample_id}"
     
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
-        if (filename.endsWith(".vcf.gz")) "4-finalVCF/VCF/$filename"
+        if (filename.endsWith(".vcf.gz")) "4-VCF/genotype_VCF/$filename"
         else null
     }
     

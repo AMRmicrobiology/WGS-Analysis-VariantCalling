@@ -2,7 +2,7 @@ process SNPEFF {
 
     tag "DB_COMPILATION AND ANNOTATIONS"
 
-    publishDir "${params.outdir}/annotations", mode: 'copy'
+    publishDir "${params.outdir}/Variant_annotations", mode: 'copy'
     
     container "$params.snpeff.docker"
 

@@ -2,7 +2,7 @@ process FILTER_VARIANTS {
     tag "Filter Variant ${sample_id}"
     
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
-        if (filename.endsWith(".vcf.gz")) "4-finalVCF/VCF/$filename"
+        if (filename.endsWith(".vcf.gz")) "4-VCF/filter_VCF/$filename"
         else null
     }
 

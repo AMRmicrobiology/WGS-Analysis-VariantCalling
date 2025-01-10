@@ -1,7 +1,7 @@
 process ASSEMBLE {
     tag "Spades ${sample_id}"
 
-    publishDir "${params.outdir}/5-assemble", mode: 'copy'
+    publishDir "${params.outdir}/5-assemble", mode: 'copy', emit: contigs
 
 
     input:
