@@ -14,11 +14,13 @@ process ADDORREPLACE {
     picard AddOrReplaceReadGroups \
     INPUT=${replace} \
     OUTPUT=${sample_id}.RG.bam \
-    RGID= M06646 \
+    RGID= ${sample_id} \
     RGLB=lib1 \
     RGPL=ILLUMINA \
     RGPU=unit1 \
     RGSM=${sample_id} \
     CREATE_INDEX=True
+    
+    samtools flagstat ${sample_id}.RG.bam > ${sample_id}_samtools_flagstat.txt
     """
 }

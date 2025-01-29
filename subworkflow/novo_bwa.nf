@@ -25,7 +25,6 @@ include { TRIMMING                                            }     from '../bin
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
-include { BUSCO                                               }     from '../bin/qc/busco/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
 include { PROKKA                                              }     from '../bin/anotations/prokka/main'
 include { BAKTA                                               }     from '../bin/anotations/bakta/main'

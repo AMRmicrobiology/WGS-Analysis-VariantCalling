@@ -21,7 +21,7 @@ process PERSONAL_GENOME_MAPPING {
     script:
     """
     bowtie2 -x ${params.index_genome_personal} -1 ${reads[0]} -2 ${reads[1]} -S ${sample_id}.sam \
-    --very-sensitive \
+    --very-sensitive-local \
     --met-file ${sample_id}_bowtie2_metrics.txt
     samtools sort < ${sample_id}.sam > ${sample_id}.bam
     samtools index ${sample_id}.bam

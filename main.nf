@@ -22,7 +22,9 @@ if (params.mode == 'novo') {
     include { novo } from "$projectDir/subworkflow/novo" 
 } else if (params.mode == 'reference') {
     include { reference } from "$projectDir/subworkflow/reference"
-} else {
+} else if (params.mode == 'assemble'){
+    include { assemble } from "$projectDir/subworkflow/assemble"
+}else {
     error "Invalid mode: ${params.mode}. Please specify 'novo' or 'reference'."
 }
 
@@ -32,6 +34,8 @@ workflow {
         novo()  // Llamar al workflow 'novo' que ha sido incluido
     } else if (params.mode == 'reference') {
         reference()  // Llamar al workflow 'reference' que ha sido incluido
+    } else if (params.mode == 'assemble') {
+        assemble()  // Llamar al workflow 'assemble' que ha sido incluido
     }
 }
 
