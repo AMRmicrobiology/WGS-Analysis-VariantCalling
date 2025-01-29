@@ -25,6 +25,7 @@ include { TRIMMING                                            }     from '../bin
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
+include { BUSCO                                               }     from '../bin/qc/busco/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
@@ -61,6 +62,9 @@ workflow workflow_pre_process {
                 
     quast_input_ch = assemble_files_ch.join(trimmed_read_ch.trimmed_reads)
     
+    //BUSCO
+    busco_ch = BUSCO(contigs_ch)
+
     //QUAST
     quast_ch = QUAST(quast_input_ch)
 
