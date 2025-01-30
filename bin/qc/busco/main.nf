@@ -14,6 +14,6 @@ process BUSCO {
     script:
 
     """
-    busco -i ${assemble} -m genome -o ${sample_id}_busco
+    busco -i ${assemble} -m genome -l bacteria -o ${sample_id}_busco
     """
 }
