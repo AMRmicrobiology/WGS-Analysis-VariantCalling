@@ -6,7 +6,7 @@
 [![license-shield]][license-url]
 
 ## Introduction
-This repository hosts a pipeline build with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for **Illumina sequencing** data of bacterial genomes. It is designed to offer an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
+This repository contains Nextflow-based pipeline for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for **Illumina sequencing** data from bacterial genomes. It is designed to provide an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
 
 
 ![Current pipeline of the project](PipelineCP_V2.0.png)
@@ -15,8 +15,9 @@ This repository hosts a pipeline build with Nextflow for whole-genome sequencing
 
 ## Contents
 - [Pipeline summary](#pipeline-summary)
-    - [*de-novo*](#de-novo)
+    - [*De-novo*](#de-novo)
     - [Refence genome](#reference-genome)
+    - [Assemble](#assemble)
 - [Installation](#installation)
 - [How to Use It](#how-to-use-it)
     - [Parameters](#parameters)
@@ -27,43 +28,35 @@ This repository hosts a pipeline build with Nextflow for whole-genome sequencing
 ## Pipeline summary:
 The pipeline includes the following steps:
 
-1. **Quality Control**: Assessment of raw sequencing data using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to evaluate read quality. Removal of low-quality bases and adapter sequences with [FastP](https://github.com/OpenGene/fastp) followed again by [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [MultiQC](https://github.com/MultiQC/MultiQC) to summarise the input data.
+1. **Quality Control**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
-At this point, the two modes available in the pipeline differ on the input reference genome. You can perform the variant calling using a [*de novo*](#de-novo) assembled reference strains or an already available [reference genome](#reference-genome). 
+    *  At this stage, the pipeline offers two modes that differ based on the input reference genome. Variant calling can be performed using either a [*de novo*](#de-novo) assembled reference strain or an existing [reference genome](#reference-genome). In the *de novo*, preliminary steps are performed to assemble the desired reference genome:
 
--  #### *De-novo*
+        *  **Assembly**: Following quality control, *de novo* assembly is performed using [SPAdes](https://github.com/ablab/spades).
+        * **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://bioinf.spbau.ru/quast), while genome completeness is assessed using [BUSCO](https://busco.ezlab.org/).
+        *   **Annotation**: Genome annotation is carried out with [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
-    - **Assembly**: After quality control as previously described, *de novo* assembly using [SPAdes](https://github.com/ablab/spades).
-    -  **Quality assembly assessment**: Structural quality metrics of the assembly using [QUAST](https://bioinf.spbau.ru/quast) and evaluation of biological completeness with [BUSCO](https://github.com/metashot/busco).
-    -   **Anotation**: Genome anotation using [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
+   
+    After the reference genome is provided (*de novo* or an exisiting reference), the pipeline follows the same steps for both modes:
 
--  #### Reference genome
-    >The pipeline includes an script to download the reads from DB using an Acc_List.txt
+2. **Aggregation of quality reports**: A summary report is genereated with [MultiQC](https://github.com/MultiQC/MultiQC), incorporating the various FastQC reports and, depending on the mode, the QUAST genome quality report.
+3. **Alignment**: Reads are aligned against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), followed by processing with [Samtools](https://github.com/samtools/samtools).
 
+4. **Variant calling and filtering**: Multiple steps are designed to identify, filter and annotate variants.
+
+    * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
+    *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
+    *  **Genetic variant annotation**: The toolbox [SnpEff](http://pcingola.github.io/SnpEff/) is used to annotate and predict the functional effects of genetic variants on genes and proteins.
+
+7. **Post-assembly Analyses**:
+    
+    * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+    *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+ 
+ >[!NOTE]The pipeline includes an script to download the reads from DB using an Acc_List.txt
     ```
     bash ./workflow/bin/download_reads.sh
     ```
-
-After inputed the reference genome, the pipeline follows the same steps for both modes:
-
-2. **Alignment**: Alignment against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2) and [samtools](https://github.com/samtools/samtools).
-3. **Quality control**: Alignment quality control using [QUAST](https://bioinf.spbau.ru/quast).
-4. **Aggregation of quality reports**: [MultiQC](https://github.com/MultiQC/MultiQC)
-
-5. **Variant calling and filtering**:
-
-    -  **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
-
-    -  **Variant Filtering**: Application of quality filters to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
-
-    -  **Genetic variant annotation**: Using [SnpEff](http://pcingola.github.io/SnpEff/), a toolbox for annotating and predicting the functional effects of genetic variants on genes and proteins.
-
-7. **Post-Alignment Analysis**:
-    
-    - Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
-
-    -  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
- 
 
 ## Installation
 The prerequisites to run the pipeline are:
