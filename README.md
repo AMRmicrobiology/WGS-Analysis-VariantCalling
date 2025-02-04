@@ -53,10 +53,12 @@ The pipeline includes the following steps:
     * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
     *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
  
- >[!NOTE] The pipeline includes an script to download the reads from DB using an Acc_List.txt
+ > [!NOTE] 
+ The pipeline includes an script to download the reads from DB using an Acc_List.txt<br>
     ```
     bash ./workflow/bin/download_reads.sh
     ```
+
 
 ## Installation
 The prerequisites to run the pipeline are:
