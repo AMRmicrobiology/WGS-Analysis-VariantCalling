@@ -6,7 +6,7 @@
 [![license-shield]][license-url]
 
 ## Introduction
-This repository hosts an advanced pipeline build with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for **Illumina sequencing** data of bacterial genomes. It is designed to offer an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
+This repository hosts a pipeline build with Nextflow for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for **Illumina sequencing** data of bacterial genomes. It is designed to offer an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
 
 
 ![Current pipeline of the project](PipelineCP_V2.0.png)
@@ -95,11 +95,9 @@ cd WGS-Analysis-VariantCalling
 Run the pipeline using the following command, adjusting the parameters as needed:
 
 *DE NOVO*
->[!IMPORTANT]
-The name of the paired-end reads of the reference sample must be labelled as **1** (e.g. AB**1**_1.fastq.gz / AB**1**_2.fastq.gz)
 
 ```
-nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
+nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
 ```
 
 *REFERENCE GENOME*
@@ -118,6 +116,8 @@ nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" -
 -profile: Specifies the execution profile (docker, singularity or local).
 
 --genome_name_db (only for --mode novo): Name of the organism that will name the databse in SnpEFF.
+
+--wildtype_code (oly for --mode novo): Defines the sample that will be taken as reference.
 
 --personal_ref (only for --mode reference): Path to the bacterial reference genome FASTA file.
 
