@@ -7,17 +7,6 @@ checkInputParams()
 
 reference         = file("${params.reference}")
 
-log.info """\
-
-WGS - P A R A M E T R E S
-==============================================
-Configuration environemnt:
-    Out directory:             $params.outdir
-    Fastq directory:           $params.input
-    Reference directory:       $params.reference
-"""
-    .stripIndent()
-
 //Call all the sub-work
 
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
@@ -29,11 +18,12 @@ include { BUSCO                                               }     from '../bin
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
+include { ARIBA                                               }     from '../bin/mlst/main'
 
 
 workflow assemble {
     preprocess_output = workflow_pre_process()
-    amrprocess_output = workflow_amr( preprocess_output.contigs_ch)
+    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch)
 }
 
 workflow workflow_pre_process {
@@ -73,11 +63,13 @@ workflow workflow_pre_process {
     
     emit:
     contigs_ch
+    fq_gz_reads_ch
 }
 
 workflow workflow_amr {
     take:
     contigs_ch
+    fq_gz_reads_ch
     
     main:
     //AMR
@@ -86,6 +78,19 @@ workflow workflow_amr {
 
     //AMR2-RESFINDER
     resfinder_ch = POST_ANALYSIS_AMRFINDER(contigs_ch)
+
+    //MLST
+
+    def organism_schemes_ch = Channel.fromPath('organisms_list.txt')
+        .splitText()
+        .map { line -> line.trim() }
+        .filter { it.startsWith(params.organism) }
+        .map { scheme -> tuple(params.organism, scheme) }
+        .unique()
+
+    def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
+
+    ariba_ch = ARIBA(combined_ch)
 
 }
 

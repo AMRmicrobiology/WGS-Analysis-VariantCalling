@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 checkInputParams()
 
 reference         = file("${params.reference}")
-
+/*
 log.info """\
 
 WGS - P A R A M E T R E S
@@ -15,9 +15,10 @@ Configuration environemnt:
     Out directory:             $params.outdir
     Fastq directory:           $params.input
     Reference directory:       $params.reference
+    DB SNPeFF name:            ${file(params.personal_ref).baseName}
 """
     .stripIndent()
-
+*/
 //Call all the sub-work
 
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'

@@ -1,74 +1,46 @@
-nextflow.enable.dsl = 2
+#!/usr/bin/env nextflow
 
-checkInputParams()
+nextflow.enable.dsl=2
 
-reference = file("${params.reference}")
+// Definir los parámetros con valores predeterminados
+params.mode = params.mode ?: ''
+params.input = params.input ?: ''
+params.reference = params.reference ?: ''
+params.outdir = params.outdir ?: 'results'
 
-log.info """\
+// Lista de modos válidos
+def valid_modes = ['novo', 'reference', 'assemble']
 
-WGS - N F   P I P E L I N E 
-            FOR 
-    C L I N I C A L   A N A L Y S I S
-==============================================
-Configuration environment:
+// Convertir `--mode` en una lista (por si el usuario pasa varios workflows separados por comas)
+def selected_modes = params.mode.split(',').collect { it.trim() }
+
+// Verificar si todos los valores pasados en `--mode` son válidos
+if( !selected_modes.every { it in valid_modes } ) {
+    error "Invalid mode(s): '${params.mode}'. Please specify one or more of: 'novo', 'reference', 'assemble'."
+}
+
+// Incluir los sub-workflows desde la carpeta `subworkflow/`
+include { novo } from './subworkflow/novo'
+include { reference } from './subworkflow/reference'
+include { assemble } from './subworkflow/assemble'
+
+workflow {
+    log.info """
+    ==============================================
+            WGS - N F   P I P E L I N E 
+    ==============================================
+    Running mode(s): ${selected_modes.join(', ')}
+    Configuration environemnt:
     Out directory:             $params.outdir
     Fastq directory:           $params.input
     Reference directory:       $params.reference
-"""
-    .stripIndent()
+    """
 
-// Incluir los sub-workflows según el modo seleccionado
-if (params.mode == 'novo') {
-    include { novo } from "$projectDir/subworkflow/novo" 
-} else if (params.mode == 'reference') {
-    include { reference } from "$projectDir/subworkflow/reference"
-} else if (params.mode == 'assemble'){
-    include { assemble } from "$projectDir/subworkflow/assemble"
-}else {
-    error "Invalid mode: ${params.mode}. Please specify 'novo' or 'reference'."
-}
-
-// Definir el workflow principal
-workflow {
-    if (params.mode == 'novo') {
-        novo()  // Llamar al workflow 'novo' que ha sido incluido
-    } else if (params.mode == 'reference') {
-        reference()  // Llamar al workflow 'reference' que ha sido incluido
-    } else if (params.mode == 'assemble') {
-        assemble()  // Llamar al workflow 'assemble' que ha sido incluido
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FUNCTIONS                                                                  //
-////////////////////////////////////////////////////////////////////////////////
-
-def checkInputParams() {
-    // Check required parameters and display error messages
-    boolean fatal_error = false
-
-    if (!params.input) {
-        log.warn("You need to provide a fastqDir (--fastqDir) or a bamDir (--bamDir)")
-        fatal_error = true
-    }
-
-    // Check required parameters based on the mode selected
-    if (params.mode == 'novo') {
-        // In clinical mode, no user-supplied reference is required
-        log.info("Using wildtype reference for clinical workflow")
-    } else if (params.mode == 'reference') {
-        // In reference mode, a user-supplied reference is required
-        if (!params.reference) {
-            log.warn("You need to provide a genome reference (--reference) for the reference workflow")
-            fatal_error = true
+    selected_modes.each { mode ->
+        switch (mode) {
+            case 'novo':      novo(); break
+            case 'reference': reference(); break
+            case 'assemble':  assemble(); break
         }
-    } else {
-        log.warn("Invalid mode: ${params.mode}. Please specify 'clinical' or 'reference'.")
-        fatal_error = true
-    }
-    
-    if (fatal_error) {
-        error("Required parameters are missing.")
     }
 }
