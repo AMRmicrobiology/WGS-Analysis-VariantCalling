@@ -9,7 +9,7 @@ process BUSCO {
     tuple val(sample_id), path(assemble)
 
     output:
-    tuple val(sample_id), path("${sample_code}_busco")
+    tuple val(sample_id), path("${sample_id}_busco")
 
     script:
 
