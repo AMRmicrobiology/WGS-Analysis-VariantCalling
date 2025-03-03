@@ -5,8 +5,8 @@ process MULTIQC_2 {
     publishDir "${params.outdir}/1-QC/genomeQC", mode: 'copy'
 
     input:
-    path quast_dir
-    path busco_dir
+    tuple val (sample_id), path (quast_dir)
+    tuple val (sample_id), path (busco_dir)
 
     output:
     path "multiqc_report"
@@ -14,6 +14,6 @@ process MULTIQC_2 {
     script:
 
     """
-    multiqc ${quast_dir} ${busco_dir} -o multiqc_report
+    multiqc ${params.quast_dir} ${params.busco_dir} -o multiqc_report
     """
 }

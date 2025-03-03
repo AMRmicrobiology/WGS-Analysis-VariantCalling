@@ -26,8 +26,8 @@ include { ARIBA                                               }     from '../bin
 
 workflow assemble {
     preprocess_output = workflow_pre_process()
-    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.busco_ch, preprocess_output.quast_all_ch)
-    postprocess_output = workflow_post_process()
+    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch )
+    postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_all_ch )
 
 }
 
@@ -65,7 +65,7 @@ workflow workflow_pre_process {
 
     //QUAST
     quast_ch = QUAST(quast_input_ch)
-    quast_all_ch = quast_ch.report_txt_quast
+    quast_all_ch = quast_ch.direct_quast
 
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
@@ -112,7 +112,7 @@ workflow workflow_post_process {
     quast_all_ch
 
     main:
-    multiqc_2_ch = POST_MULTIQC(params.quast_dir, params.busco_dir)
+    multiqc_2_ch = POST_MULTIQC(quast_all_ch, busco_ch)
 
 }
 
