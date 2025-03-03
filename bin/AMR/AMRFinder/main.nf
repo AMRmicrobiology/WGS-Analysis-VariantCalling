@@ -1,7 +1,7 @@
 process AMR_2 {
     tag "AMRFinder PROCESS"
 
-    publishDir "${params.outdir}/AMR/AMRFinder", mode: 'copy'
+    publishDir "${params.outdir}/3-AMR/AMRFinder", mode: 'copy'
 
     container "$params.amrfinderplus.docker"
 

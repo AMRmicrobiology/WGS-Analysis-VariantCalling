@@ -1,7 +1,7 @@
 process QUAST {
     tag "QC_ASSEMBLE"
     
-    publishDir "${params.outdir}/5-assemble/QUAST", mode: 'copy'
+    publishDir "${params.outdir}/1-QC/genomeQC/QUAST", mode: 'copy'
     
     input:
     tuple val(sample_id), path(contigs), path(scaffolds), path(trimmed_reads)

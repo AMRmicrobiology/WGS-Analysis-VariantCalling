@@ -12,13 +12,16 @@ reference         = file("${params.reference}")
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
+include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
+include { PROKKA                                              }     from '../bin/anotations/prokka/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
-include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
+include { MULTIQC_2                                           }     from '../bin/qc/multiqc/main_2' 
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
 include { ARIBA                                               }     from '../bin/mlst/main'
+
 
 
 workflow assemble {
@@ -52,6 +55,9 @@ workflow workflow_pre_process {
                 
     quast_input_ch = assemble_files_ch.join(trimmed_read_ch.trimmed_reads)
     
+    //PROKKA
+    prokka_ch = PROKKA(contigs_ch)
+
     //BUSCO
     busco_ch = BUSCO(contigs_ch)
 
@@ -91,6 +97,8 @@ workflow workflow_amr {
     def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
 
     ariba_ch = ARIBA(combined_ch)
+
+    multiqc_2_ch = MULTIQC_2(params.quast_dir, params.busco_dir)
 
 }
 

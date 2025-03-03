@@ -1,7 +1,7 @@
 process AMR {
     tag "ABRICATE PROCESS"
 
-    publishDir "${params.outdir}/AMR/ABRICATE/", mode: 'copy'
+    publishDir "${params.outdir}/3-AMR/ABRICATE/", mode: 'copy'
 
     container "$params.abricate.docker"
 
