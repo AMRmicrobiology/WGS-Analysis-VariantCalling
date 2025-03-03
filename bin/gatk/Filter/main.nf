@@ -48,22 +48,27 @@ process FILTER_VARIANTS {
         echo "Indexing VCF file ${vcf}..."
         tabix -p vcf ${vcf}
     fi
-    
-    # Filtering SNPs
+
+    # Filtering SNPs with Balance of Alleles
+    echo "Filtering SNPs with Quality and Balance of Alleles..."
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualSNP" --filter-expression "QUAL < 50.0 || MQ < 40.0 || DP < 30" \\
+        --filter-name "LowQualSNP" \\
+        --filter-expression "QUAL < 50.0 || MQ < 40.0 || DP < 30 || (vc.getGenotype(0).getAD().1 / (vc.getGenotype(0).getAD().0 + vc.getGenotype(0).getAD().1)) < 0.9" \\
         -O ${sample_id}_snps_filtered.vcf.gz
 
-    # Filtering Indels
+    # Filtering Indels with Homopolymer Regions
+    echo "Filtering Indels with Quality and Homopolymer Regions..."
     gatk VariantFiltration \\
         -R ${reference} \\
         -V ${vcf} \\
-        --filter-name "LowQualIndel" --filter-expression "QUAL < 200.0 || MQ < 40.0 || DP < 30" \\
+        --filter-name "LowQualIndel" \\
+        --filter-expression "QUAL < 200.0 || MQ < 40.0 || DP < 30 || HRun > 6" \\
         -O ${sample_id}_indels_filtered.vcf.gz
 
     # Select only variants that pass the filter (labels with PASS)
+    echo "Selecting passing SNPs..."
     gatk SelectVariants \\
         -R ${reference} \\
         -V ${sample_id}_snps_filtered.vcf.gz \\
@@ -71,6 +76,7 @@ process FILTER_VARIANTS {
         --select-type-to-include SNP \\
         -O ${sample_id}_snps_pass.vcf.gz
 
+    echo "Selecting passing Indels..."
     gatk SelectVariants \\
         -R ${reference} \\
         -V ${sample_id}_indels_filtered.vcf.gz \\
@@ -79,6 +85,7 @@ process FILTER_VARIANTS {
         -O ${sample_id}_indels_pass.vcf.gz
 
     # Combine SNPs and indels filtered in one file
+    echo "Combining SNPs and Indels..."
     bcftools concat -a -O z -o ${sample_id}_filtered_snp_indel.vcf.gz ${sample_id}_snps_pass.vcf.gz ${sample_id}_indels_pass.vcf.gz
     bcftools index ${sample_id}_filtered_snp_indel.vcf.gz
     """

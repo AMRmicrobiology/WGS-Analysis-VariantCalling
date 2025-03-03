@@ -58,5 +58,8 @@ process GENOTYPE {
 
     # Index the output VCF file
     tabix -f -p vcf final_${sample_id}.vcf.gz
+
+    echo "Generating VCF statistics with bcftools..."
+    bcftools stats final_${sample_id}.vcf.gz > final_${sample_id}.vcf.stats
     """
 }

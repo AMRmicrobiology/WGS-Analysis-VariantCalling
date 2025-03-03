@@ -7,8 +7,9 @@ process QUAST {
     tuple val(sample_id), path(contigs), path(scaffolds), path(trimmed_reads)
 
     output:
-    tuple val(sample_id), path("quast_result_${sample_id}/report.tsv"), emit: report_tsv_quast
-    tuple val(sample_id),path("quast_result_${sample_id}/report.txt"), emit: report_txt_quast
+    tuple val(sample_id), path("quast_result_${sample_id}/report_${sample_id}.tsv"), emit: report_tsv_quast
+    tuple val(sample_id), path("quast_result_${sample_id}/report.txt"), emit: report_txt_quast
+    path "quast_result_${sample_id}/", emit: direct_quast    
 
     script:
 
@@ -24,6 +25,8 @@ process QUAST {
     --rna-finding \\
     --contig-thresholds 0 \\
     ${contigs} \\
-    ${scaffolds} 
+    ${scaffolds}
+
+    mv quast_result_${sample_id}/report.tsv quast_result_${sample_id}/report_${sample_id}.tsv
     """
 }

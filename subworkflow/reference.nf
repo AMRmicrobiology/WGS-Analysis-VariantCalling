@@ -7,17 +7,6 @@ checkInputParams()
 
 reference         = file("${params.reference}")
 
-log.info """\
-
-    P A R A M E T R E S   mode  R E F E R E N C E 
-=======================================================
-Configuration environemnt:
-    Out directory:             $params.outdir
-    Fastq directory:           $params.input
-    Reference Personal-genome: $params.personal_ref
-    DB SNPeFF name:            ${file(params.personal_ref).baseName}
-"""
-    .stripIndent()
 
 //Call all the sub-work
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
