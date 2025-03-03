@@ -17,7 +17,7 @@ include { ASSEMBLE                                            }     from '../bin
 include { PROKKA                                              }     from '../bin/anotations/prokka/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
-include { MULTIQC_2                                           }     from '../bin/qc/multiqc/main_2' 
+include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
 include { ARIBA                                               }     from '../bin/mlst/main'
@@ -27,6 +27,13 @@ include { ARIBA                                               }     from '../bin
 workflow assemble {
     preprocess_output = workflow_pre_process()
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch)
+    Channel
+        .from(preprocess_output.contigs_ch, amrprocess_output.abricate_ch)
+        .collect()
+        .set { all_done }
+
+    postprocess_output = workflow_post_process(all_done)
+
 }
 
 workflow workflow_pre_process {
@@ -98,7 +105,18 @@ workflow workflow_amr {
 
     ariba_ch = ARIBA(combined_ch)
 
-    multiqc_2_ch = MULTIQC_2(params.quast_dir, params.busco_dir)
+    emit:
+    abricate_ch 
+
+}
+
+workflow workflow_post_process {
+
+    take:
+    dummy_ch
+    
+    main:
+    multiqc_2_ch = POST_MULTIQC(params.quast_dir, params.busco_dir)
 
 }
 

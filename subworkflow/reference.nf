@@ -12,7 +12,7 @@ reference         = file("${params.reference}")
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
-include { MULTIQC                                             }     from '../bin/qc/multiqc/main_2'
+include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
 include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'

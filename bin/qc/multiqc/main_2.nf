@@ -2,7 +2,7 @@ process MULTIQC_2 {
 
     tag "Generating MultiQC report"
     
-    publishDir "${params.qcdir}/1-QC/genomeQC", mode: 'copy'
+    publishDir "${params.outdir}/1-QC/genomeQC", mode: 'copy'
 
     input:
     path quast_dir
