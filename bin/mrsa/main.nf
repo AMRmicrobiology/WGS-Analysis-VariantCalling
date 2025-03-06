@@ -2,7 +2,7 @@ process MRSA {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
 
-    publishDir "${params.out}/MRSA/spaTyper" , mode:"copy"
+    publishDir "${params.outdir}/5-MRSA/spaTyper" , mode:"copy"
 
     input:
 
@@ -17,7 +17,6 @@ process MRSA {
     script:
     
     """
-    
     download-spatypes.sh
     
     spaTyper -d /opt/conda/envs/env/share/spatyper-0.3.3 -f ${contigs} --output ${sample_id}_spatype.txt 
@@ -28,7 +27,7 @@ process MRSA {
 process SCCMEC {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
-    publishDir "${params.out}/MRSA/SCCMEC" , mode: "copy"
+    publishDir "${params.outdir}/5-MRSA/SCCMEC" , mode: "copy"
     
     input:
 

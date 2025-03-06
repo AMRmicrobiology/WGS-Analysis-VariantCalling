@@ -105,10 +105,6 @@ workflow workflow_amr {
 
     ariba_ch = ARIBA(combined_ch)
 
-    //MRSA
-
-    mrsa_ch = MRSA (contigs_ch)
-    sccmec_ch = SCCMEC(contigs_ch)
 }
 
 workflow workflow_post_process {
@@ -119,6 +115,19 @@ workflow workflow_post_process {
 
     main:
     multiqc_2_ch = POST_MULTIQC(quast_all_ch, busco_ch)
+
+}
+
+workflow workflow_mrsa {
+    take:
+    contigs_ch
+
+    main:
+    
+    //MRSA
+
+    mrsa_ch = MRSA (contigs_ch)
+    sccmec_ch = SCCMEC(contigs_ch)
 
 }
 
