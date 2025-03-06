@@ -1,8 +1,8 @@
 name: env
 channels:
-  - conda-forge
-  - bioconda
   - defaults
+  - bioconda
+  - conda-forge
   - https://repo.anaconda.com/pkgs/main
   - https://repo.anaconda.com/pkgs/r
 dependencies:
@@ -171,6 +171,7 @@ dependencies:
   - mdurl=0.1.2=pyhd8ed1ab_1
   - minced=0.4.2=hdfd78af_1
   - minimap2=2.28=he4a0461_3
+  - mlst=2.23.0=hdfd78af_0
   - mpfr=4.2.1=h90cbb55_3
   - multiqc=1.27.1=pyhdfd78af_0
   - munkres=1.1.4=pyh9f0ad1d_0
@@ -222,6 +223,7 @@ dependencies:
   - perl-class-inspector=1.36=pl5321hdfd78af_0
   - perl-class-load=0.25=pl5321ha770c72_1
   - perl-class-load-xs=0.10=pl5321hb9d3cd8_0
+  - perl-class-method-modifiers=2.13=pl5321hdfd78af_0
   - perl-class-methodmaker=2.25=pl5321h7b50bb2_1
   - perl-clone=0.46=pl5321hd590300_0
   - perl-common-sense=3.75=pl5321hdfd78af_0
@@ -300,6 +302,7 @@ dependencies:
   - perl-module-load=0.34=pl5321hdfd78af_0
   - perl-module-runtime=0.016=pl5321ha770c72_1
   - perl-module-runtime-conflicts=0.003=pl5321ha770c72_0
+  - perl-moo=2.005004=pl5321hdfd78af_0
   - perl-moose=2.2207=pl5321hb9d3cd8_1
   - perl-mozilla-ca=20211001=pl5321hdfd78af_0
   - perl-mro-compat=0.15=pl5321ha770c72_0
@@ -319,6 +322,7 @@ dependencies:
   - perl-pod-escapes=1.07=pl5321hdfd78af_2
   - perl-readonly=2.05=pl5321ha770c72_0
   - perl-regexp-common=2017060201=pl5321hd8ed1ab_0
+  - perl-role-tiny=2.002004=pl5321hdfd78af_0
   - perl-safe=2.37=pl5321hdfd78af_2
   - perl-scalar-list-utils=1.68=pl5321hb9d3cd8_0
   - perl-set-intspan=1.19=pl5321hdfd78af_2
@@ -333,6 +337,7 @@ dependencies:
   - perl-sub-identify=0.14=pl5321hb9d3cd8_2
   - perl-sub-install=0.928=pl5321hd8ed1ab_0
   - perl-sub-name=0.28=pl5321hb9d3cd8_1
+  - perl-sub-quote=2.006006=pl5321hdfd78af_0
   - perl-sub-uplevel=0.2800=pl5321hec16e2b_4
   - perl-svg=2.87=pl5321hd8ed1ab_0
   - perl-term-progressbar=2.22=pl5321hdfd78af_1
@@ -425,6 +430,7 @@ dependencies:
   - six=1.17.0=pyhd8ed1ab_0
   - sniffio=1.3.1=pyhd8ed1ab_1
   - spades=4.0.0=h6dccd9a_3
+  - spatyper=0.3.3=pyhdfd78af_3
   - spectra=0.0.11=pyhd8ed1ab_2
   - sqlite=3.46.0=h6d4b2fc_0
   - sysroot_linux-64=2.17=h0157908_18
