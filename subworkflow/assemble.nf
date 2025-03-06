@@ -18,6 +18,8 @@ include { PROKKA                                              }     from '../bin
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
 include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
+include { MRSA                                                }     from '../bin/mrsa/main'
+include { SCCMEC                                              }     from '../bin/mrsa/main'
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
 include { ARIBA                                               }     from '../bin/mlst/main'
@@ -103,6 +105,10 @@ workflow workflow_amr {
 
     ariba_ch = ARIBA(combined_ch)
 
+    //MRSA
+
+    mrsa_ch = MRSA (contigs_ch)
+    sccmec_ch = SCCMEC(contigs_ch)
 }
 
 workflow workflow_post_process {

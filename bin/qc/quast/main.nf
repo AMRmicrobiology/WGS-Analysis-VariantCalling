@@ -25,7 +25,8 @@ process QUAST {
     --rna-finding \\
     --contig-thresholds 0 \\
     ${contigs} \\
-    ${scaffolds}
+    ${scaffolds} \\
+    --threads 8
 
     mv quast_result_${sample_id}/report.tsv quast_result_${sample_id}/report_${sample_id}.tsv
     """

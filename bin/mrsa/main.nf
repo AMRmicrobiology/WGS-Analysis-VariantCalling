@@ -1,7 +1,6 @@
 process MRSA {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
-
     input:
 
     tuple val (sample_id), path(contigs)
@@ -9,18 +8,16 @@ process MRSA {
 
     output:
 
-    tuple val (sample_id), path ()
+    tuple val (sample_id), path ("${sample_id}_spatype.txt")
 
 
     script:
     
     """
-
-    // SE LE PUEDE ANADIR UN COLLECT
-
+    
     download-spatypes.sh
     
-    spaTyper -d /opt/conda/envs/env/share/spatyper-0.3.3 -f ${contigs} --output spatype.txt 
+    spaTyper -d /opt/conda/envs/env/share/spatyper-0.3.3 -f ${contigs} --output ${sample_id}_spatype.txt 
 
     """
 }
@@ -28,6 +25,7 @@ process MRSA {
 process SCCMEC {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
+    publishDir "${params.out}/"
     
     input:
 
@@ -36,13 +34,13 @@ process SCCMEC {
 
     output:
 
-    tuple val (sample_id), path ()
+    path "*.tsv"
 
 
     script:
     
-    """   
-    sccmec --input ${contings} --prefix ${sample_id}
+    """
+    sccmec --input ${contigs} --prefix ${sample_id}
 
     """
 }
