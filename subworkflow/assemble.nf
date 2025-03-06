@@ -30,7 +30,9 @@ workflow assemble {
     preprocess_output = workflow_pre_process()
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch )
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_all_ch )
-
+    if (params.mrsa) {
+        mrsaprocess_output = workflow_mrsa(preprocess_output.contigs_ch)
+    }
 }
 
 workflow workflow_pre_process {
