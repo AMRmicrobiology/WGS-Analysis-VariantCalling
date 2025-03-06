@@ -2,7 +2,7 @@ process MULTIQC {
 
     tag "Generating MultiQC report"
 
-    publishDir "${params.qcdir}", mode: 'copy'
+    publishDir "${params.outdir}/1-QC/fastqQC", mode: 'copy'
 
     input:
     path fastqc_first

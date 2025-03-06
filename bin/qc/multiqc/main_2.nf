@@ -1,12 +1,12 @@
-process MULTIQC {
+process MULTIQC_2 {
 
     tag "Generating MultiQC report"
     
-    publishDir "${params.qcdir}", mode: 'copy'
+    publishDir "${params.outdir}/1-QC/genomeQC", mode: 'copy'
 
     input:
-    path fastqc_first
-    path fastqc_after
+    path (quast_folder)
+    tuple val (sample_id), path (busco_folder)
 
     output:
     path "multiqc_report"
@@ -14,6 +14,7 @@ process MULTIQC {
     script:
 
     """
-    multiqc ${fastqc_first} ${fastqc_after} -o multiqc_report
+    multiqc ./ -o multiqc_report
+
     """
 }

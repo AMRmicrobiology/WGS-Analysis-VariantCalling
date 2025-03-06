@@ -3,7 +3,7 @@ process BUSCO {
 
     container "$params.busco.docker"
     
-    publishDir "${params.outdir}/BUSCO", mode: "copy" 
+    publishDir "${params.outdir}/1-QC/genomeQC/BUSCO", mode: "copy" 
 
     input:
     tuple val(sample_id), path(assemble)

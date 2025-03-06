@@ -1,7 +1,7 @@
 process PROKKA {
     tag "PROKKA ANNOTATION"
 
-    publishDir "${params.outdir}/annotations", mode: 'copy', saveAs: { filename ->
+    publishDir "${params.outdir}/2-assemble/annotations", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".gff")) {
             return "6-prokka/${sample_id}/${sample_id}.gff"
         } else if (filename.endsWith(".faa")) {

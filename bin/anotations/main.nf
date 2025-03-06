@@ -1,7 +1,7 @@
 process AGT {
     tag "MERGE ANNOTATIONS"
 
-    publishDir "${params.outdir}/annotations/data_base", mode: 'copy'
+    publishDir "${params.outdir}/2-assemble/annotations/data_base", mode: 'copy'
 
     container "$params.agat.docker"
     

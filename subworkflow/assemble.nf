@@ -12,18 +12,27 @@ reference         = file("${params.reference}")
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
+include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
+include { PROKKA                                              }     from '../bin/anotations/prokka/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
-include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
+include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
+include { MRSA                                                }     from '../bin/mrsa/main'
+include { SCCMEC                                              }     from '../bin/mrsa/main'
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
 include { ARIBA                                               }     from '../bin/mlst/main'
 
 
+
 workflow assemble {
     preprocess_output = workflow_pre_process()
-    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch)
+    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch )
+    postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_all_ch )
+    if (params.mrsa) {
+        mrsaprocess_output = workflow_mrsa(preprocess_output.contigs_ch)
+    }
 }
 
 workflow workflow_pre_process {
@@ -52,11 +61,15 @@ workflow workflow_pre_process {
                 
     quast_input_ch = assemble_files_ch.join(trimmed_read_ch.trimmed_reads)
     
+    //PROKKA
+    prokka_ch = PROKKA(contigs_ch)
+
     //BUSCO
     busco_ch = BUSCO(contigs_ch)
 
     //QUAST
     quast_ch = QUAST(quast_input_ch)
+    quast_all_ch = quast_ch.direct_quast
 
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
@@ -64,6 +77,8 @@ workflow workflow_pre_process {
     emit:
     contigs_ch
     fq_gz_reads_ch
+    busco_ch
+    quast_all_ch
 }
 
 workflow workflow_amr {
@@ -91,6 +106,30 @@ workflow workflow_amr {
     def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
 
     ariba_ch = ARIBA(combined_ch)
+
+}
+
+workflow workflow_post_process {
+
+    take:
+    busco_ch
+    quast_all_ch
+
+    main:
+    multiqc_2_ch = POST_MULTIQC(quast_all_ch, busco_ch)
+
+}
+
+workflow workflow_mrsa {
+    take:
+    contigs_ch
+
+    main:
+    
+    //MRSA
+
+    mrsa_ch = MRSA (contigs_ch)
+    sccmec_ch = SCCMEC(contigs_ch)
 
 }
 
