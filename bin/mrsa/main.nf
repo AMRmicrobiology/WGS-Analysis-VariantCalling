@@ -1,6 +1,9 @@
 process MRSA {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
+
+    publishDir "${params.out}/MRSA/spaTyper" , mode:"copy"
+
     input:
 
     tuple val (sample_id), path(contigs)
@@ -25,7 +28,7 @@ process MRSA {
 process SCCMEC {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
-    publishDir "${params.out}/"
+    publishDir "${params.out}/MRSA/SCCMEC" , mode: "copy"
     
     input:
 
