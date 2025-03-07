@@ -4,11 +4,11 @@ process BAKTA {
 
     publishDir "${params.outdir}/2-assemble/annotations", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".gff3")) {
-            return "7-bakta/${sample_id}/${sample_id}.gff3"
+            return "bakta/${sample_id}/${sample_id}.gff3"
         } else if (filename.endsWith(".faa")) {
-            return "7-bakta/${sample_id}/${sample_id}.faa"
+            return "bakta/${sample_id}/${sample_id}.faa"
         } else if (filename.endsWith(".fna")) {
-            return "7-bakta/${sample_id}/${sample_id}.fna"
+            return "bakta/${sample_id}/${sample_id}.fna"
         } else {
             return null
         }
