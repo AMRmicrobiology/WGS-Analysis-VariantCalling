@@ -5,7 +5,7 @@ process MULTIQC_2 {
     publishDir "${params.outdir}/1-QC/genomeQC", mode: 'copy'
 
     input:
-    path (quast_folder)
+    tuple val (sample_id), path (quast_folder)
     tuple val (sample_id), path (busco_folder)
 
     output:
