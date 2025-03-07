@@ -23,7 +23,7 @@ include { SCCMEC                                              }     from '../bin
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
 include { ARIBA                                               }     from '../bin/mlst/main'
-
+include { MLST                                                }     from '../bin/mlst/main_2'
 
 
 workflow assemble {
@@ -94,7 +94,7 @@ workflow workflow_amr {
     //AMR2-RESFINDER
     resfinder_ch = POST_ANALYSIS_AMRFINDER(contigs_ch)
 
-    //MLST
+    //MLST FAST RAW DATA- ARIBA
 
     def organism_schemes_ch = Channel.fromPath('organisms_list.txt')
         .splitText()
@@ -131,6 +131,8 @@ workflow workflow_mrsa {
     mrsa_ch = MRSA (contigs_ch)
     sccmec_ch = SCCMEC(contigs_ch)
 
+    //MLST
+    MLST(contigs_ch)
 }
 
 

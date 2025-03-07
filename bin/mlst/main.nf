@@ -1,7 +1,7 @@
 process ARIBA {
     tag "ARIBA for ${sample_id} with ${scheme}"
 
-    publishDir "${params.outdir}/4-MLST", mode: 'copy'
+    publishDir "${params.outdir}/4-MLST/ARIBA", mode: 'copy'
     
     container "$params.ariba.docker"
     
