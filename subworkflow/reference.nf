@@ -36,9 +36,9 @@ workflow workflow_pre_process {
     main:
     // Quality control and Index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
-    /*
+    
     fastqc_ch_original= FASTQC_QUALITY_ORIGINAL(read_ch.map{it -> it[1]})
-    */
+    
     // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
