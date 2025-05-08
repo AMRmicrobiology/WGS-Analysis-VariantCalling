@@ -14,7 +14,7 @@ process ADDORREPLACE {
     picard AddOrReplaceReadGroups \
     INPUT=${replace} \
     OUTPUT=${sample_id}.RG.bam \
-    RGID= ${sample_id} \
+    RGID=${sample_id} \
     RGLB=lib1 \
     RGPL=ILLUMINA \
     RGPU=unit1 \
