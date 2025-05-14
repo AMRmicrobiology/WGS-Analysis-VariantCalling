@@ -119,7 +119,10 @@ workflow workflow_post_process {
  
     // BAKTA PROCESS BUILD A GFF OF REFERENCE 
     gff_ch = BAKTA(reference_ch)
-   
+
+    // Ejecuta BAKTA con un canal de ensamblajes
+    (bakta_gff3_ch, bakta_faa_ch, bakta_fna_ch) = BAKTA(reference_ch)
+
     //BUILD CDS for contruction of DB in snpeff
     cds_ch = bakta_gff3_ch
     .combine(bakta_fna_ch)
