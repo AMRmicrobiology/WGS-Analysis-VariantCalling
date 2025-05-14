@@ -3,7 +3,6 @@ process EXTRACT_CDS_FROM_BAKTA {
 
     container "$params.agat.docker"
 
-
     input:
     tuple val(sample_id), path(gff3_file), path(fna_file)
 
@@ -12,7 +11,7 @@ process EXTRACT_CDS_FROM_BAKTA {
 
     script:
     """
-    gffread ${gff3_file} -g ${fna_file} -x cds_${sample_id}.fa
+    sed 's/\\t?\\t/\\t.\\t/g' ${gff3_file} > cleaned_${sample_id}.gff3
+    gffread cleaned_${sample_id}.gff3 -g ${fna_file} -x cds_${sample_id}.fa
     """
-
 }
