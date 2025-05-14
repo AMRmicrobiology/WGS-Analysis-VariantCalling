@@ -12,8 +12,10 @@ process PERSONAL_GENOME_MAPPING {
     
     output:
     tuple val(sample_id), path("${sample_id}.sam"), 
-    path("${sample_id}.bam"), path("${sample_id}.bam.bai"),
-    path("${sample_id}_bowtie2_metrics.txt"), path("${sample_id}_samtools_flagstat.txt")
+    path("${sample_id}.bam"),
+    path("${sample_id}.bam.bai"),
+    path("${sample_id}_bowtie2_metrics.txt"),
+    path("${sample_id}_samtools_flagstat.txt")
     
     when:
     file(params.index_genome_personal + ".1.bt2").exists()

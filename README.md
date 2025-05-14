@@ -15,18 +15,19 @@ This repository contains Nextflow-based pipeline for whole-genome sequencing (WG
 
 ## Contents
 - [Pipeline summary](#pipeline-summary)
-    - [*De-novo*](#de-novo)
-    - [Refence genome](#reference-genome)
-    - [Assemble](#assemble)
+    - [Refence genome](#mode---reference-and---novo)
+    - [*De-novo*](#mode---reference-and---novo)
+    - [Assemble](#mode---assemble)
 - [Installation](#installation)
 - [How to Use It](#how-to-use-it)
     - [Parameters](#parameters)
 - [References](#reference)
-.
+
 
 
 ## Pipeline summary:
-The pipeline includes the following steps:
+
+All modes in the pipeline includes the following steps:
 
 1. **Quality Control**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 
@@ -36,28 +37,39 @@ The pipeline includes the following steps:
         * **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://bioinf.spbau.ru/quast), while genome completeness is assessed using [BUSCO](https://busco.ezlab.org/).
         *   **Annotation**: Genome annotation is carried out with [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
-   
-    After the reference genome is provided (*de novo* or an exisiting reference), the pipeline follows the same steps for both modes:
 
-2. **Aggregation of quality reports**: A summary report is genereated with [MultiQC](https://github.com/MultiQC/MultiQC), incorporating the various FastQC reports and, depending on the mode, the QUAST genome quality report.
-3. **Alignment**: Reads are aligned against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), followed by processing with [Samtools](https://github.com/samtools/samtools).
+#### mode --reference and --novo
+> ***Reference and De-novo***    
+>After the reference genome is provided (*de novo* or an exisiting reference), the pipeline follows the same steps for both modes:
+>
+>    2. **Aggregation of quality reports**: A summary report is genereated with [MultiQC](https://github.com/MultiQC/MultiQC), incorporating the various FastQC reports and, depending on the mode, the QUAST genome quality report.
+>    3. **Alignment**: Reads are aligned against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), followed by processing with [Samtools](https://github.com/samtools/samtools).
+>    4. **Variant calling and filtering**: Multiple steps are designed to identify, filter and annotate variants.
+>        * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
+>        *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
+>        *  **Genetic variant annotation**: The toolbox [SnpEff](http://pcingola.github.io/SnpEff/) is used to annotate and predict the functional effects of genetic variants on genes and proteins.
+>    7. **Post-assembly Analyses**: 
+>        * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+>        *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
 
-4. **Variant calling and filtering**: Multiple steps are designed to identify, filter and annotate variants.
+#### mode --assemble
 
-    * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
-    *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
-    *  **Genetic variant annotation**: The toolbox [SnpEff](http://pcingola.github.io/SnpEff/) is used to annotate and predict the functional effects of genetic variants on genes and proteins.
+> ***Assemble***    
+>For the --mode assemble, a simplifies pipeline is performed:
+>
+>    2. **Post-assembly Analyses**: 
+>        * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
+>        *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+>       * MLST analysis: [ARIBA]() performs a fast MLST analysis, using the raw fastq data and [MLST]() a slow MLST analysis using the genome assembly. 
+>       * *Staphylococcus aureus*: In case --mrsa is true, the [spaTyper]() and [sccmec]() software analysis are performed.
 
-7. **Post-assembly Analyses**:
-    
-    * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
-    *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
- 
  > [!NOTE] 
  The pipeline includes an script to download the reads from DB using an Acc_List.txt<br>
     ```
     bash ./workflow/bin/download_reads.sh
     ```
+   
+
 
 
 ## Installation
@@ -87,10 +99,9 @@ To create a local conda environment type the following commands:
 
 Run the pipeline using the following commands, adjusting the parameters as needed:
 
-*DE NOVO*
-
+*ASSEMBLE*
 ```
-nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
+nextflow run main.nf --mode assemble --input "/path/to/data/*_{1,2}.fastq.gz" --mrsa <true> -profile <docker/singularity/conda>
 ```
 
 *REFERENCE GENOME*
@@ -98,15 +109,24 @@ nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wild
 nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" --personal_ref "/path/to/bacterial_genome.fasta" -profile <docker/singularity/conda>
 ```
 
+*DE NOVO*
+
+```
+nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
+```
+
+
 ### Parameters
 
---mode: Depends on the analysis - novo/reference.
+--mode: Depends on the analysis - assemble/reference/novo.
 
 --input: Path to input FASTQ paired-end files generated by Illumina sequencing (file format: .fastq.gz).
 
 --outdir: Directory where the results will be stored (default: out).
 
 -profile: Specifies the execution profile (docker, singularity or conda).
+
+--mrsa (only for --mode assemble): Specific for *Staphylococcus aureus* genome asseblies. It performs the [spaTyper]() and [sccmec]() software analysis (dafault: false).
 
 --genome_name_db (only for --mode novo): Name of the organism that will name the database in SnpEFF.
 
