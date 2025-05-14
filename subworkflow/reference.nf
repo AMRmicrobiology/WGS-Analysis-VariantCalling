@@ -121,12 +121,12 @@ workflow workflow_post_process {
     gff_ch = BAKTA(reference_ch)
    
     //BUILD CDS for contruction of DB in snpeff
-    cds_ch = gff_ch.bakta_gff3
-    .combine(gff_ch.bakta_faa)
-    .map { gff3_tuple, faa_tuple ->
+    cds_ch = bakta_gff3_ch
+    .combine(bakta_fna_ch)
+    .map { gff3_tuple, fna_tuple ->
      def sample_id = gff3_tuple[0]
      def gff3 =  gff3_tuple[1]
-     def fna = faa_tuple[1]
+     def fna = fna_tuple[1]
      tuple(sample_id, gff3, fna)
     }
     cds_ch.view()
