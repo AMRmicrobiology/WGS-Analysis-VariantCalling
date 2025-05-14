@@ -13,6 +13,8 @@ include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
+include { BAKTA                                               }     from '../bin/anotations/bakta/main'
+include { EXTRACT_CDS_FROM_BAKTA			      }     from '../bin/anotations/bakta/main_2'
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
 include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
@@ -20,11 +22,10 @@ include { MARKDUPLICATE                                       }     from '../bin
 include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
 include { HAPLOTYPECALLER                                     }     from '../bin/gatk/haplotype/main_1'
 include { GENOTYPE as GENOTYPE_ANALYSIS                       }     from '../bin/gatk/genotype/main'
-include { ALIGN as NORMALICE_WILDTYPE                         }     from '../bin/gatk/Filter/align'
+include { ALIGN as NORMALICE_DATA                             }     from '../bin/gatk/Filter/align'
 include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
-/*
-include { ANOTATIONS as ANOTATION_SNPEFF                      }     from '../bin/snpeff/main'
-*/
+include { DECOMPRESS_VCF                                      }     from '../bin/snpeff/main_2'
+include { SNPEFF			                      }     from '../bin/snpeff/main'
 
 workflow reference {
     preprocess_output = workflow_pre_process()
@@ -90,16 +91,15 @@ workflow workflow_post_process {
     
     //Marckduplicate
     gatk_add_ch = MARKDUPLICATE(gatk_mark_ch)
-
-    /*
+    
     //HAPLOTYPECALLER realignment consistently
 
-    haplotype_ch = gatk_mark_ch.map { sample_id, bam, _ -> tuple(sample_id, bam) }
+    haplotype_ch = gatk_add_ch.map { sample_id, bam, _ -> tuple(sample_id, bam) }
     .combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) })
     .set { all_samples_ch }
 
     gatk_haplotype_ch= HAPLOTYPECALLER(all_samples_ch) 
-
+    
     //GenotypeCaller
     gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch.out_files , gatk_haplotype_ch.reference_personal_genome)
 
@@ -107,20 +107,25 @@ workflow workflow_post_process {
     //This tool takes a VCF file, left-aligns the indels and trims common bases from indels, leaving them with a minimum representation.
     //The same indel can often be placed at multiple positions and still represent the same haplotype.
     //We are going to take the optionally splits multiallelic sites into biallelics and left-aligns individual alleles.
-    aligns_and_normalized_ch = NORMALICE_WILDTYPE (gatk_genotype_ch, gatk_haplotype_ch.reference_personal_genome)
+    aligns_and_normalized_ch = NORMALICE_DATA (gatk_genotype_ch, gatk_haplotype_ch.reference_personal_genome)
 
     //VatiantFilter
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
-    varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, gatk_haplotype_ch.reference_personal_genome)
+    variant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, gatk_haplotype_ch.reference_personal_genome)
    
     // Decompress VCF
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
-
+ 
+    // BAKTA PROCESS BUILD A GFF OF REFERENCE 
+    gff_ch = BAKTA(reference_ch)
     
+    //BUILD CDS for contruction of DB in snpeff
+    cds_ch = EXTRACT_CDS_FROM_BAKTA( gff_ch.map {sample_id, gff3, faa, fna -> tuple(sample_id, gff3, fna) })
+   /* 
     // Functional annotation with SNPeff (optional)
-    snpeff_ch = SNPEFF(agt_ch.combine_gff3, reference_ch, params.genome_name_db, agt_ch.protein_fasta, agt_ch.cds_fasta, vcf_ch)
-    */
+    snpeff_ch = SNPEFF(agt_ch.bakta_gff3, reference_ch, params.genome_name_db, agt_ch.bakta_faa, cds_ch.cds_fasta, vcf_ch)
+   */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
