@@ -119,7 +119,7 @@ workflow workflow_post_process {
  
     // BAKTA PROCESS BUILD A GFF AND CDS OF REFERENCE
     gff_ch = BAKTA(reference_ch)
-    cds_ch = bakta_anotation_ch.conv_gff.map { sample_id, gff3, fna ->
+    cds_ch = gff_ch.conv_gff.map { sample_id, gff3, fna ->
     tuple(sample_id, gff3, fna)}
 
     cds_next_ch = EXTRACT_CDS_FROM_BAKTA(cds_ch)
