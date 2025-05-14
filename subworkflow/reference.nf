@@ -117,12 +117,13 @@ workflow workflow_post_process {
     // Decompress VCF
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
  
-    // BAKTA PROCESS BUILD A GFF OF REFERENCE 
+    // BAKTA PROCESS BUILD A GFF AND CDS OF REFERENCE
     gff_ch = BAKTA(reference_ch)
-    gff_ch.conv_gff.view()
+    cds_ch = bakta_anotation_ch.conv_gff.map { sample_id, gff3, fna ->
+    tuple(sample_id, gff3, fna)}
+
+    cds_next_ch = EXTRACT_CDS_FROM_BAKTA(cds_ch)
     /*
-    cds_next_ch = EXTRACT_CDS_FROM_BAKTA(gff_ch.conv_gff)
-    
     // Functional annotation with SNPeff (optional)
     snpeff_ch = SNPEFF(agt_ch.bakta_gff3, reference_ch, params.genome_name_db, agt_ch.bakta_faa, cds_next_ch.cds_fasta, vcf_ch)
     */
