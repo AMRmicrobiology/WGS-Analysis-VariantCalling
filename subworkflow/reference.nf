@@ -119,26 +119,13 @@ workflow workflow_post_process {
  
     // BAKTA PROCESS BUILD A GFF OF REFERENCE 
     gff_ch = BAKTA(reference_ch)
-
-    // Ejecuta BAKTA con un canal de ensamblajes
-    (bakta_gff3_ch, bakta_faa_ch, bakta_fna_ch) = BAKTA(reference_ch)
-
-    //BUILD CDS for contruction of DB in snpeff
-    cds_ch = bakta_gff3_ch
-    .combine(bakta_fna_ch)
-    .map { gff3_tuple, fna_tuple ->
-     def sample_id = gff3_tuple[0]
-     def gff3 =  gff3_tuple[1]
-     def fna = fna_tuple[1]
-     tuple(sample_id, gff3, fna)
-    }
-    cds_ch.view()
+    gff_ch.conv_gff.view()
+    /*
+    cds_next_ch = EXTRACT_CDS_FROM_BAKTA(gff_ch.conv_gff)
     
-    cds_next_ch = EXTRACT_CDS_FROM_BAKTA(cds_ch)
-    /* 
     // Functional annotation with SNPeff (optional)
     snpeff_ch = SNPEFF(agt_ch.bakta_gff3, reference_ch, params.genome_name_db, agt_ch.bakta_faa, cds_next_ch.cds_fasta, vcf_ch)
-   */
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
