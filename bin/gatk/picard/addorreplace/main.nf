@@ -14,13 +14,15 @@ process ADDORREPLACE {
     picard AddOrReplaceReadGroups \
     INPUT=${replace} \
     OUTPUT=${sample_id}.RG.bam \
-    RGID= ${sample_id} \
+    RGID=${sample_id} \
     RGLB=lib1 \
     RGPL=ILLUMINA \
     RGPU=unit1 \
     RGSM=${sample_id} \
     CREATE_INDEX=True
-    
+    SORT_ORDER=coordinate
+
     samtools flagstat ${sample_id}.RG.bam > ${sample_id}_samtools_flagstat.txt
+    samtools view -H ${sample_id}.RG.bam | grep '@RG' || echo "RG tag missing!"
     """
 }

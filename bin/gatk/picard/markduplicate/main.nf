@@ -14,7 +14,7 @@ process MARKDUPLICATE {
         I=${bam} \
         O=${sample_id}.dedup.bam \
         METRICS_FILE=${sample_id}.dedup.metrics.txt \
-        ASSUME_SORTED=True \
+        ASSUME_SORT_ORDER=coordinate \
         REMOVE_DUPLICATES=true
     """
 }

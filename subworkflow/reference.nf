@@ -36,9 +36,9 @@ workflow workflow_pre_process {
     main:
     // Quality control and Index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
-    /*
+    
     fastqc_ch_original= FASTQC_QUALITY_ORIGINAL(read_ch.map{it -> it[1]})
-    */
+    
     // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
@@ -78,7 +78,7 @@ workflow workflow_post_process {
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
 
 
-    //Add groups and Mark duplicates
+    //Add groups and add or replace group
     bam_ch = specie_mapping_ch.map {
         tupla -> 
         def sample_id = tupla [0]
@@ -86,30 +86,21 @@ workflow workflow_post_process {
         return tuple (sample_id, bam_path)
     }
 
-    gatk_mark_ch = MARKDUPLICATE (bam_ch)
+    gatk_mark_ch = ADDORREPLACE(bam_ch)
     
-    //Add or replace groups
-    replace_ch = gatk_mark_ch.map {
-        tupla -> 
-        def sample_id = tupla [0]
-        def replace_bam = tupla [1]
-        return tuple (sample_id, replace_bam)
-    }
-    
-    gatk_add_ch = ADDORREPLACE(replace_ch)
+    //Marckduplicate
+    gatk_add_ch = MARKDUPLICATE(gatk_mark_ch)
 
-    //HAPLOTYPECALLER
-    // realignment consistently incluide in the algoritme of GATK HaplotypeCaller.
-    // minimum quality and confidence threshold are included
-    haplotype_ch = gatk_add_ch
-    .combine(reference_ch)
+    /*
+    //HAPLOTYPECALLER realignment consistently
+
+    haplotype_ch = gatk_mark_ch.map { sample_id, bam, _ -> tuple(sample_id, bam) }
+    .combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) })
     .set { all_samples_ch }
-    
-    gatk_haplotype_ch = HAPLOTYPECALLER (all_samples_ch)
 
-    //GenotypeCaller 
-    //Perform joint genotyping 
+    gatk_haplotype_ch= HAPLOTYPECALLER(all_samples_ch) 
 
+    //GenotypeCaller
     gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch.out_files , gatk_haplotype_ch.reference_personal_genome)
 
     //Align
@@ -122,7 +113,7 @@ workflow workflow_post_process {
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
     varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, gatk_haplotype_ch.reference_personal_genome)
-    /*
+   
     // Decompress VCF
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
 
