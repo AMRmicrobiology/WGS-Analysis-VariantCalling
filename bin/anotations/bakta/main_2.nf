@@ -7,7 +7,7 @@ process EXTRACT_CDS_FROM_BAKTA {
     tuple val(sample_id), path(gff3_file), path(fna_file)
 
     output:
-    tuple val(sample_id), path("cds_${sample_id}.fa"), emit: cds_fasta
+    path("cds_${sample_id}.fa"), emit: cds_fasta
 
     script:
     """

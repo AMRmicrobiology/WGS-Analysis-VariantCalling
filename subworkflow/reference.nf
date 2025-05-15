@@ -123,10 +123,10 @@ workflow workflow_post_process {
     tuple(sample_id, gff3, fna)}
 
     cds_next_ch = EXTRACT_CDS_FROM_BAKTA(cds_ch)
-    /*
+
     // Functional annotation with SNPeff (optional)
-    snpeff_ch = SNPEFF(agt_ch.bakta_gff3, reference_ch, params.genome_name_db, agt_ch.bakta_faa, cds_next_ch.cds_fasta, vcf_ch)
-    */
+    snpeff_ch = SNPEFF(gff_ch.bakta_gff3, reference_ch, params.genome_name_db, gff_ch.bakta_faa, cds_next_ch.cds_fasta, vcf_ch)
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
