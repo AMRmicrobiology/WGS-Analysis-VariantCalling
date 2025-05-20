@@ -30,19 +30,8 @@ process SNPEFF {
       >> \$SNPEFF_HOME/snpEff.config
 
     # 2) Construye la base de datos
-    snpEff build \
-      -gff3 \
-      -c \$SNPEFF_HOME/snpEff.config \
-      -noCheckCds \
-      -noCheckProtein \
-      ${genome_name_db}
+    snpEff build -gff3 -c \$SNPEFF_HOME/snpEff.config -noCheckCds -noCheckProtein ${genome_name_db}
 
-    # 3) Anota el VCF
-    snpEff ann \
-      -c \$SNPEFF_HOME/snpEff.config \
-      -noLog -noStats -no-upstream -no-downstream -no-utr \
-      -v ${genome_name_db} \
-      ${variants_vcf} \
-      > annotated_${new_id}_variants.vcf
+    snpEff ann -c \$SNPEFF_HOME/snpEff.config -noLog -noStats -no-upstream -no-downstream -no-utr -v ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
     """
 }
