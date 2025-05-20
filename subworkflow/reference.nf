@@ -25,7 +25,7 @@ include { GENOTYPE as GENOTYPE_ANALYSIS                       }     from '../bin
 include { ALIGN as NORMALISE_DATA                             }     from '../bin/gatk/Filter/align'
 include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
 include { DECOMPRESS_VCF                                      }     from '../bin/snpeff/main_2'
-include { SNPEFF			                                  }     from '../bin/snpeff/main'
+include { SNPEFF			                                  }     from '../bin/snpeff/main_3'
 
 workflow reference {
     preprocess_output = workflow_pre_process()
@@ -119,13 +119,9 @@ workflow workflow_post_process {
  
     // BAKTA PROCESS BUILD A GFF AND CDS OF REFERENCE
     gff_ch = BAKTA(reference_ch)
-    cds_ch = gff_ch.conv_gff.map { sample_id, gff3, fna ->
-    tuple(sample_id, gff3, fna)}
-
-    cds_next_ch = EXTRACT_CDS_FROM_BAKTA(cds_ch)
-
+ 
     // Functional annotation with SNPeff (optional)
-    snpeff_ch = SNPEFF(gff_ch.bakta_gff3, reference_ch, params.genome_name_db, gff_ch.bakta_faa, cds_next_ch.cds_fasta, vcf_ch)
+    snpeff_ch = SNPEFF(gff_ch.bakta_gff3, reference_ch, params.genome_name_db, vcf_ch)
     
 }
 

@@ -20,6 +20,7 @@ process BAKTA {
     output:
     path "annotations_${sample_id}/${sample_id}.gff3", emit: bakta_gff3
     path "annotations_${sample_id}/${sample_id}.faa", emit: bakta_faa
+    path "annotations_${sample_id}/${sample_id}.ffn", emit: bakta_ffn
     tuple val(sample_id), path("annotations_${sample_id}/${sample_id}.gff3"), path("annotations_${sample_id}/${sample_id}.fna"), emit: conv_gff
 
     script:
