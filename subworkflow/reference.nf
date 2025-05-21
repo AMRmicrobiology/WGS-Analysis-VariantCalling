@@ -118,11 +118,33 @@ workflow workflow_post_process {
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
  
     // BAKTA PROCESS BUILD A GFF AND CDS OF REFERENCE
-    gff_ch = BAKTA(reference_ch)
- 
-    // Functional annotation with SNPeff (optional)
-    snpeff_ch = SNPEFF(gff_ch.bakta_gff3, reference_ch, params.genome_name_db, vcf_ch)
-    
+    // PARAMS GFF PROVIDE OR NOT FORM THE CUSTOMER
+    // Select GFF source (BAKTA or custom)
+    if (params.custom_gff3 && params.custom_gff3 != 'null') {
+        log.info "Using custom GFF3 file provided by the user: ${params.custom_gff3}"
+        gff3_ch = Channel.value(file(params.custom_gff3))
+    } else {
+        log.info "No custom GFF3 file provided — running BAKTA to generate it from the reference"
+        gff3_ch = BAKTA(reference_ch)
+    }
+
+    // Combine channels for SNPEFF
+    vcf_gff_combined_ch = vcf_ch.combine(gff3_ch.bakta_gff3)
+    vcf_gff_ref_combined_ch = vcf_gff_combined_ch.combine(reference_ch)
+
+    snpeff_input_ch = vcf_gff_ref_combined_ch.map { entry ->
+        def (sample_id, vcf_path, gff3_path, ref_id, ref_fasta) = entry
+        return tuple(
+            gff3_path,
+            ref_id,
+            ref_fasta,
+            params.genome_name_db,
+            sample_id,
+            vcf_path
+        )
+    }
+
+    snpeff_ch = SNPEFF(snpeff_input_ch)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

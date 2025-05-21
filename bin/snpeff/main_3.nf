@@ -1,37 +1,56 @@
 process SNPEFF {
 
-    tag "DB_COMPILATION AND ANNOTATIONS"
+    tag { "SNPEFF_${new_id}" }
+
     publishDir "${params.outdir}/Variant_annotations", mode: 'copy'
-    container "$params.snpeff.docker"
-    cpus 2
-
+    container "${params.snpeff.docker}"
+    
     input:
-    path gff3_file
-    tuple val(id_reference), path(assembly_file)
-    val genome_name_db
-    tuple val(new_id), path(variants_vcf)
-
+    tuple(
+        path(gff3_file),
+        val(id_reference),
+        path(assembly_file),
+        val(genome_name_db),
+        val(new_id),
+        path(variants_vcf)
+    )
 
     output:
-    path "annotated_${new_id}_variants.vcf", emit: annotated_vcf
+    path("annotated_${new_id}_variants.vcf"), emit: annotated_vcf
 
     script:
     """
-    # Variables de entorno
+    echo ">>> GFF3: ${gff3_file}"
+    echo ">>> REF ID: ${id_reference}"
+    echo ">>> Ensamblado FASTA: ${assembly_file}"
+    echo ">>> DB nombre: ${genome_name_db}"
+    echo ">>> Sample ID: ${new_id}"
+    echo ">>> VCF input: ${variants_vcf}"
+
     SNPEFF_HOME=/opt/conda/envs/snpeff_env/share/snpeff-5.2-1
-    DATA_DIR=\\\$SNPEFF_HOME/data
+    DB_DIR=\$PWD/snpeff_db/${genome_name_db}
+    CONFIG_FILE=\$PWD/snpEff.config
 
-    # 1) Prepara la DB
-    mkdir -p \$DATA_DIR/${genome_name_db}
-    cp ${assembly_file} \$DATA_DIR/${genome_name_db}/sequences.fa
-    cp ${gff3_file}     \$DATA_DIR/${genome_name_db}/genes.gff
+    mkdir -p \$DB_DIR
 
-    echo "${genome_name_db}.genome : ${genome_name_db}" \
-      >> \$SNPEFF_HOME/snpEff.config
+    # Copiar los archivos necesarios solo si no existen
+    [ ! -f "\$DB_DIR/sequences.fa" ] && cp ${assembly_file} \$DB_DIR/sequences.fa
+    [ ! -f "\$DB_DIR/genes.gff" ]     && cp ${gff3_file}     \$DB_DIR/genes.gff
 
-    # 2) Construye la base de datos
-    snpEff build -gff3 -c \$SNPEFF_HOME/snpEff.config -noCheckCds -noCheckProtein ${genome_name_db}
+    # Configuración de snpEff
+    if [ ! -f "\$CONFIG_FILE" ]; then
+      echo "${genome_name_db}.genome : ${genome_name_db}" > \$CONFIG_FILE
+    fi
 
-    snpEff ann -c \$SNPEFF_HOME/snpEff.config -noLog -noStats -no-upstream -no-downstream -no-utr -v ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
+    # Construcción condicional de la base de datos
+    if [ ! -f "\$DB_DIR/snpEffectPredictor.bin" ]; then
+      echo "→ Construyendo DB SNPeff..."
+      snpEff build -gff3 -c \$CONFIG_FILE -dataDir \$PWD/snpeff_db -noCheckCds -noCheckProtein ${genome_name_db}
+    else
+      echo "→ DB SNPeff ya existe. Saltando construcción."
+    fi
+
+    # Anotación
+    snpEff ann -c \$CONFIG_FILE -dataDir \$PWD/snpeff_db -noLog -noStats -no-upstream -no-downstream -no-utr -v ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
     """
 }
