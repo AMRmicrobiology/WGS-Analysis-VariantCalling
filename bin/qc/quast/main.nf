@@ -6,7 +6,7 @@ process QUAST {
     errorStrategy 'ignore'
     
     input:
-    tuple val(sample_id), path(contigs), path(scaffolds), path(trimmed_reads)
+    tuple val(sample_id), path(contigs), path(trimmed_reads)
 
     output:
 
@@ -27,7 +27,6 @@ process QUAST {
     --rna-finding \\
     --contig-thresholds 0 \\
     ${contigs} \\
-    ${scaffolds} \\
 
     """
 }

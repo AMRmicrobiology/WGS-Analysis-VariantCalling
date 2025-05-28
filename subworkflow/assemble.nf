@@ -28,10 +28,10 @@ include { MLST                                                }     from '../bin
 
 workflow assemble {
     preprocess_output = workflow_pre_process()
-    amrprocess_output = workflow_amr( preprocess_output.contigs_ch, preprocess_output.fq_gz_reads_ch )
+    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch )
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
-        mrsaprocess_output = workflow_mrsa(preprocess_output.contigs_ch)
+        mrsaprocess_output = workflow_mrsa(preprocess_output.accurance_fasta_ch)
     }
 }
 
@@ -48,33 +48,70 @@ workflow workflow_pre_process {
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
    
+    //KRAKEN
+    kraken_ch = KRAKEN(fq_gz_reads_ch)
+
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
 
+    //PRUNNING
+    fastq_prunning_ch = fq_gz_reads_ch.join(kraken_ch.keep_ids).map {
+        sample_id,reads_pair, keep_ids ->
+        def (r1, r2) = reads_pair
+        tuple (sample_id, [r1, r2], keep_ids)
+    }
+    
+    prune_ch = SEQTK_PRUNE(fastq_prunning_ch)
+
+
     //de novo assemble
-    assemble_denovo_ch = ASSEMBLE(trimmed_read_ch.trimmed_reads)
+    assemble_denovo_ch = ASSEMBLE(prune_ch)
     contigs_ch = assemble_denovo_ch.contigs
     scaffolds_ch = assemble_denovo_ch.scaffolds
     
-    assemble_files_ch = contigs_ch
-                .join(scaffolds_ch)
-                
-    quast_input_ch = assemble_files_ch.join(trimmed_read_ch.trimmed_reads)
+    //Filter seq low quality contigs
+    filtered_contigs_ch = FILTER_CONTIGS(contigs_ch)
+ 
+    //Polishing Illumina SEQ
+    polish_data_ch = filtered_contigs_ch
+        .join(trimmed_read_ch.trimmed_reads)
+        .map { sample_id, contigs, reads_clean_pair -> 
+        def (r1, r2) = reads_clean_pair
+        tuple (sample_id, contigs , [r1, r2])
+    }
+
+    polishing_illumina_ch = ALIGMENT_PILON(polish_data_ch)
+    
+    polish_data_index_ch = filtered_contigs_ch
+        .join(polishing_illumina_ch.aln_bam)
+        .map { sample_id, contigs, index_bam -> 
+        tuple (sample_id, contigs , index_bam)
+    }
+
+    pilon_polish_ch = PILON_POLISH(polish_data_index_ch)
+    accurance_fasta_ch = pilon_polish_ch.pilon_fa
     
     //PROKKA
-    prokka_ch = PROKKA(contigs_ch)
+    prokka_ch = PROKKA(accurance_fasta_ch)
 
     //BUSCO
-    busco_ch = BUSCO(contigs_ch)
+    busco_ch = BUSCO(accurance_fasta_ch)
 
     //QUAST
+
+    quast_input_ch = accurance_fasta_ch.join(trimmed_read_ch.trimmed_reads)
+        .map { sample_id, contigs, reads_clean_pair ->
+        def (r1, r2) = reads_clean_pair
+        tuple (sample_id, contigs, [r1, r2])
+    }
+
     quast_ch = QUAST(quast_input_ch)
 
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
     
     emit:
-    contigs_ch
+    accurance_fasta_ch
     fq_gz_reads_ch
     busco_ch
     quast_ch
@@ -82,16 +119,16 @@ workflow workflow_pre_process {
 
 workflow workflow_amr {
     take:
-    contigs_ch
+    accurance_fasta_ch
     fq_gz_reads_ch
     
     main:
     //AMR
     //AMR1-ABRIcate
-    abricate_ch = POST_ANALYSIS_ABRICATE(contigs_ch)
+    abricate_ch = POST_ANALYSIS_ABRICATE(accurance_fasta_ch)
 
     //AMR2-RESFINDER
-    resfinder_ch = POST_ANALYSIS_AMRFINDER(contigs_ch)
+    resfinder_ch = POST_ANALYSIS_AMRFINDER(accurance_fasta_ch)
 
     //MLST FAST RAW DATA- ARIBA
 
@@ -121,17 +158,17 @@ workflow workflow_post_process {
 
 workflow workflow_mrsa {
     take:
-    contigs_ch
+    accurance_fasta_ch
 
     main:
     
     //MRSA
 
-    mrsa_ch = MRSA (contigs_ch)
-    sccmec_ch = SCCMEC(contigs_ch)
+    mrsa_ch = MRSA (accurance_fasta_ch)
+    sccmec_ch = SCCMEC(accurance_fasta_ch)
 
     //MLST
-    MLST(contigs_ch)
+    MLST(accurance_fasta_ch)
 }
 
 
