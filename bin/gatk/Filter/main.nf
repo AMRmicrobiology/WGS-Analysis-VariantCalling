@@ -55,7 +55,7 @@ process FILTER_VARIANTS {
         -R ${reference} \\
         -V ${vcf} \\
         --filter-name "LowQualSNP" \\
-        --filter-expression "QUAL < 50.0 || MQ < 40.0 || DP < 30 || (vc.getGenotype(0).getAD().1 / (vc.getGenotype(0).getAD().0 + vc.getGenotype(0).getAD().1)) < 0.9" \\
+        --filter-expression "QUAL < 50.0 || MQ < 40.0 || DP < 20 || (vc.getGenotype(0).getAD().1 / (vc.getGenotype(0).getAD().0 + vc.getGenotype(0).getAD().1)) < 0.9" \\
         -O ${sample_id}_snps_filtered.vcf.gz
 
     # Filtering Indels with Homopolymer Regions
@@ -64,7 +64,7 @@ process FILTER_VARIANTS {
         -R ${reference} \\
         -V ${vcf} \\
         --filter-name "LowQualIndel" \\
-        --filter-expression "QUAL < 200.0 || MQ < 40.0 || DP < 30 || HRun > 6" \\
+        --filter-expression "QUAL < 200.0 || MQ < 40.0 || DP < 30 || HRun > 7" \\
         -O ${sample_id}_indels_filtered.vcf.gz
 
     # Select only variants that pass the filter (labels with PASS)

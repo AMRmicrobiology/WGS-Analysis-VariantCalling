@@ -51,6 +51,6 @@ process SNPEFF {
     fi
 
     # Anotación
-    snpEff ann -c \$CONFIG_FILE -dataDir \$PWD/snpeff_db -noLog -noStats -no-upstream -no-downstream -no-utr -v ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
+    snpEff ann -c \$CONFIG_FILE -dataDir \$PWD/snpeff_db -v ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
     """
 }

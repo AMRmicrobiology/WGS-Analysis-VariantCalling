@@ -59,6 +59,7 @@ process HAPLOTYPECALLER {
         -O ${sample_id}.g.vcf.gz \
         --standard-min-confidence-threshold-for-calling 30 \
         --minimum-mapping-quality 30 \
+        --pcr-indel-model NONE \
         -ERC GVCF
 
     # Verificar que el archivo de salida se haya creado correctamente

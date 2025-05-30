@@ -16,8 +16,11 @@ include { MULTIQC                                             }     from '../bin
 include { BAKTA                                               }     from '../bin/anotations/bakta/main'
 include { EXTRACT_CDS_FROM_BAKTA			                  }     from '../bin/anotations/bakta/main_2'
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
+/*
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
-include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
+*/
+include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main_bwa'
+/*
 include { MARKDUPLICATE                                       }     from '../bin/gatk/picard/markduplicate/main'
 include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
 include { HAPLOTYPECALLER                                     }     from '../bin/gatk/haplotype/main_1'
@@ -26,10 +29,12 @@ include { ALIGN as NORMALISE_DATA                             }     from '../bin
 include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
 include { DECOMPRESS_VCF                                      }     from '../bin/snpeff/main_2'
 include { SNPEFF			                                  }     from '../bin/snpeff/main_3'
-
+*/
 workflow reference {
     preprocess_output = workflow_pre_process()
+    /*
     postprocess_output = workflow_post_process(preprocess_output.reference_ch, preprocess_output.fq_gz_reads_ch)
+    */
 }
 
 workflow workflow_pre_process {
@@ -60,13 +65,35 @@ workflow workflow_pre_process {
     }
 
     personal_index_bwa_ch = BUILD_INDEX_1(reference_ch)
+    
+    fasta_collected_ch = personal_index_bwa_ch.fasta.collect()
+    index_collected_ch = personal_index_bwa_ch.index_files.collect()
+
+    // 2. Combinar reads con fasta e índices
+    mapping_input_ch = fq_gz_reads_ch
+        .combine(fasta_collected_ch)
+        .combine(index_collected_ch)
+        .map { read_tuple, fasta_tuple, index_tuple ->
+            def (sample_id, reads) = read_tuple
+            def (ref_id, fasta_path) = fasta_tuple
+            return tuple(sample_id, reads, fasta_path, index_tuple)
+        }
+
+    // 3. Enviar esto al proceso de mapeo
+    specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
+
+    /*
+    specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, personal_index_bwa_ch.fasta, personal_index_bwa_ch.index_files)
+    
+    
     personal_index_ch = PERSONAL_GENOME_INDEX(reference_ch)
+    */
 
     emit:
     reference_ch
     fq_gz_reads_ch
 }
-
+ /*
 workflow workflow_post_process {
 
     take:
@@ -78,7 +105,7 @@ workflow workflow_post_process {
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
 
-
+   
     //Add groups and add or replace group
     bam_ch = specie_mapping_ch.map {
         tupla -> 
@@ -144,10 +171,11 @@ workflow workflow_post_process {
             vcf_path
         )
     }
-
+    
     snpeff_ch = SNPEFF(snpeff_input_ch)
+ 
 }
-
+   */
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS                                                                  //
 ////////////////////////////////////////////////////////////////////////////////
