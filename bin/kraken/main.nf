@@ -26,9 +26,7 @@ process SEQTK_PRUNE {
     tuple val(sample_id), path(reads), path(keep_ids)
     
   output:
-    tuple val(sample_id),
-      path("${sample_id}.R1.clean.fastq.gz"),
-      path("${sample_id}.R2.clean.fastq.gz")
+    tuple val(sample_id), path("${sample_id}.R1.clean.fastq.gz"), path("${sample_id}.R2.clean.fastq.gz")
 
   script:
   """

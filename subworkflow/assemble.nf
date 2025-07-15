@@ -65,8 +65,7 @@ workflow workflow_pre_process {
     }
     
     prune_ch = SEQTK_PRUNE(fastq_prunning_ch)
-
-
+    
     //de novo assemble
     assemble_denovo_ch = ASSEMBLE(prune_ch)
     contigs_ch = assemble_denovo_ch.contigs
