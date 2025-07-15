@@ -17,7 +17,7 @@ include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
 include { ALIGMENT_PILON;PILON_POLISH                         }     from '../bin/qc/polish/main'
-include { PROKKA                                              }     from '../bin/anotations/prokka/main'
+include { PROKKA                                              }     from '../bin/anotations/prokka/main_2'
 include { BAKTA                                               }     from '../bin/anotations/bakta/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
@@ -93,10 +93,10 @@ workflow workflow_pre_process {
 
     pilon_polish_ch = PILON_POLISH(polish_data_index_ch)
     accurance_fasta_ch = pilon_polish_ch.pilon_fa
-    /*
+    
     //PROKKA
     prokka_ch = PROKKA(accurance_fasta_ch)
-    */
+    
 
     //BAKTA
     bakta_annotation_ch = BAKTA(accurance_fasta_ch)
@@ -159,7 +159,7 @@ workflow workflow_post_process {
     quast_ch
 
     main:
-    multiqc_2_ch = POST_MULTIQC(quast_ch, busco_ch)
+    multiqc_2_ch = POST_MULTIQC(quast_ch.map{ it -> it[1] }.collect(), busco_ch.map{ it -> it[1] }.collect())
 
 }
 

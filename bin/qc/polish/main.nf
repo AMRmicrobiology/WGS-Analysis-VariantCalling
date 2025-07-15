@@ -34,7 +34,7 @@ process PILON_POLISH {
   memory '32 GB'
 
 
-  publishDir "${params.outdir}/pilon", mode: 'copy', patterns: ['*.pilon.changes.txt', '*.fasta']
+  publishDir "${params.outdir}/2-Assembly/", mode: 'copy', patterns: ['*.pilon.changes.txt', '${sample_id}.fasta']
 
   input:
   tuple val(sample_id), path(filtered_fasta), path(index_bam)
@@ -42,7 +42,6 @@ process PILON_POLISH {
   output:
   tuple val(sample_id), path("${sample_id}.fasta"), emit: pilon_fa
   path "${sample_id}.pilon.changes.txt", emit: info_pilon_changes
-  path "${sample_id}.pilon.variants.vcf", emit: info_pilon_vcf
 
   script:
   """

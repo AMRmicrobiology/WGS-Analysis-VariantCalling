@@ -1,9 +1,6 @@
 process ASSEMBLE {
     tag "Spades ${sample_id}"
 
-    publishDir "${params.outdir}/2-assemble", mode: 'copy'
-
-
     input:
 
     tuple val (sample_id), path(pair_id_1), path(pair_id_2)
