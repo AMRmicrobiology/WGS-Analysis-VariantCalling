@@ -9,6 +9,12 @@ process BAKTA {
             return "bakta/${sample_id}/${sample_id}.faa"
         } else if (filename.endsWith(".fna")) {
             return "bakta/${sample_id}/${sample_id}.fna"
+        } else if (filename.endsWith(".gbff")) {
+            return "bakta/${sample_id}/${sample_id}.gbff"
+        } else if (filename.endsWith(".txt")) {
+            return "bakta/${sample_id}/${sample_id}.txt"
+        } else if (filename.endsWith(".json")) {
+            return "bakta/${sample_id}/${sample_id}.json"
         } else {
             return null
         }
@@ -21,6 +27,9 @@ process BAKTA {
     path "annotations_${sample_id}/${sample_id}.gff3", emit: bakta_gff3
     path "annotations_${sample_id}/${sample_id}.faa", emit: bakta_faa
     path "annotations_${sample_id}/${sample_id}.ffn", emit: bakta_ffn
+    path "annotations_${sample_id}/${sample_id}.gbff", emit: bakta_gbff
+    path "annotations_${sample_id}/${sample_id}.txt", emit: bakta_txt
+    path "annotations_${sample_id}/${sample_id}.json", emit: bakta_json
     tuple val(sample_id), path("annotations_${sample_id}/${sample_id}.gff3"), path("annotations_${sample_id}/${sample_id}.fna"), emit: conv_gff
 
     script:

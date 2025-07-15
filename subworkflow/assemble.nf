@@ -18,6 +18,7 @@ include { ASSEMBLE                                            }     from '../bin
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
 include { ALIGMENT_PILON;PILON_POLISH                         }     from '../bin/qc/polish/main'
 include { PROKKA                                              }     from '../bin/anotations/prokka/main'
+include { BAKTA                                               }     from '../bin/anotations/bakta/main'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
 include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
@@ -92,9 +93,13 @@ workflow workflow_pre_process {
 
     pilon_polish_ch = PILON_POLISH(polish_data_index_ch)
     accurance_fasta_ch = pilon_polish_ch.pilon_fa
-    
+    /*
     //PROKKA
     prokka_ch = PROKKA(accurance_fasta_ch)
+    */
+
+    //BAKTA
+    bakta_annotation_ch = BAKTA(accurance_fasta_ch)
 
     //BUSCO
     busco_ch = BUSCO(accurance_fasta_ch)
