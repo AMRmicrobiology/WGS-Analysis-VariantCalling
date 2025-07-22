@@ -132,7 +132,7 @@ workflow workflow_amr {
     main:
     //AMR
     //AMR1-ABRIcate
-    abricate_ch = POST_ANALYSIS_ABRICATE(accurance_fasta_ch)
+    abricate_ch = POST_ANALYSIS_ABRICATE(accurance_fasta_ch, params.organism)
 
     //AMR2-RESFINDER
     resfinder_ch = POST_ANALYSIS_AMRFINDER(accurance_fasta_ch)
@@ -149,6 +149,9 @@ workflow workflow_amr {
     def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
 
     ariba_ch = ARIBA(combined_ch)
+    
+    //MLST
+    MLST(accurance_fasta_ch)
 
 }
 
@@ -174,8 +177,6 @@ workflow workflow_mrsa {
     mrsa_ch = MRSA (accurance_fasta_ch)
     sccmec_ch = SCCMEC(accurance_fasta_ch)
 
-    //MLST
-    MLST(accurance_fasta_ch)
 }
 
 
