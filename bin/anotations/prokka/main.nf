@@ -17,12 +17,13 @@ process PROKKA {
     tuple val (sample_id), path(assembly_file)
 
     output:
-    path "annotations_${sample_id}/${sample_id}_wildtype.gff", emit: prokka_gff
-    path "annotations_${sample_id}/${sample_id}_wildtype.faa", emit: prokka_faa
-    path "annotations_${sample_id}/${sample_id}_wildtype.fna", emit: prokka_fna
+    path "annotations_${sample_id}/${sample_id}.gff", emit: prokka_gff
+    path "annotations_${sample_id}/${sample_id}.faa", emit: prokka_faa
+    path "annotations_${sample_id}/${sample_id}.fna", emit: prokka_fna
+    tuple val(sample_id), path("annotations_${sample_id}/${sample_id}.fna"), emit: prokka_path
 
     script:
     """
-    prokka --outdir annotations_${sample_id} --prefix ${sample_id}_wildtype --kingdom Bacteria ${assembly_file}
+    prokka --outdir annotations_${sample_id} --prefix ${sample_id} --kingdom Bacteria --compliant ${assembly_file}
     """
 }
