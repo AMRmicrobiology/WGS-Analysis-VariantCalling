@@ -29,13 +29,12 @@ This repository contains Nextflow-based pipeline for whole-genome sequencing (WG
 
 All modes in the pipeline includes the following steps:
 
-1. **Quality Control**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+1. **Reads QC and trimming**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of quality control with [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). A final report of the fastqc file quality is summarised in [MultiQC](https://github.com/MultiQC/MultiQC). An additional quality control is included to discard contaminant sequences with [Kraken2](https://github.com/DerrickWood/kraken2) and prune the remam 
 
-    *  At this stage, the pipeline offers two modes that differ based on the input reference genome. Variant calling can be performed using either a [*de novo*](#de-novo) assembled reference strain or an existing [reference genome](#reference-genome). In the *de novo*, preliminary steps are performed to assemble the desired reference genome:
+2. **Assembly and genome QC**: All inputted genomes are assembled *de novo* using [SPAdes](https://github.com/ablab/spades). Following genome assembly, structural quality metrics are evaluated with [QUAST](https://bioinf.spbau.ru/quast), and genome completeness is assessed using [BUSCO](https://busco.ezlab.org/). A final summary report is generated with [MultiQC](https://github.com/MultiQC/MultiQC).
+3. **Annotation**: Genome annotation is carried out with both [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
 
-        *  **Assembly**: Following quality control, *de novo* assembly is performed using [SPAdes](https://github.com/ablab/spades).
-        * **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://bioinf.spbau.ru/quast), while genome completeness is assessed using [BUSCO](https://busco.ezlab.org/).
-        *   **Annotation**: Genome annotation is carried out with [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
+    *  At this stage, the pipeline offers three modes that differ based on the input (reference) genome and the desired output. Variant calling can be performed using either a [*de novo*](#de-novo) assembled reference genome or an existing [reference genome](#reference-genome). The third pipeline only takes the  In the *de novo*, preliminary steps are performed to assemble the desired reference genome:
 
 
 #### mode --reference and --novo
