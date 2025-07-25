@@ -183,11 +183,9 @@ workflow workflow_post_process {
     personal_ref_ch
         
     main:
-    
-    //2nd Step
-    //mapping process- Mapping used Specie ref. genome, include samtools sorted
+    //Mapping process- Mapping used Specie ref. genome, include samtools sorted
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
-/*
+
     //Add groups and Mark duplicates
     bam_ch = specie_mapping_ch.map {
         tupla -> 
@@ -197,6 +195,7 @@ workflow workflow_post_process {
     }
 
     gatk_mark_ch = MARKDUPLICATE (bam_ch)
+    
     //Add or replace groups
     replace_ch = gatk_mark_ch.map {
         tupla -> 
@@ -227,7 +226,7 @@ workflow workflow_post_process {
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
     varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, personal_ref_ch)
-
+/*
     //DESCROMPRES VCF
     vcf_ch = DECOMPRESS_VCF(varaiant_filter_ch.compl_vcf)
 
