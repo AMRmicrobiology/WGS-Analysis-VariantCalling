@@ -127,13 +127,14 @@ nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wild
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Additional Options ────────────────────────────────────────────────────────────────────────────────────╮
 │--outdir   PATH    Directory to write the output [default: out]                                          │
-│-w         PATH    Path to the work directory where temporary files will be written [default: ./work ]   │ │--mrsa     TEXT    (--mode assemble)   For *Staphylococcus aureus* assemblies                            │
+│-w         PATH    Path to the work directory where temporary files will be written [default: ./work ]   │--mrsa     TEXT    (--mode assemble)   For *Staphylococcus aureus* assemblies                            │
 │                   It performs the spaTyper and sccmec software analysis [default: false]                │
+│--help             Show this message and exit                                                            │      
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Trimming Options ──────────────────────────────────────────────────────────────────────────────────────╮
-│--cut_front        INTERGER    Move a sliding window from front (5') to tail, drop the bases in the      │
+│--cut_front        INTERGER    Move a sliding window from front to tail, drop the bases in the           │
 │                               window if  its mean quality < threshold, stop otherwise [default: 15]     │
-│--cut_tail         INTERGER    Move a sliding window from tail (3') to front, drop the bases in the      │
+│--cut_tail         INTERGER    Move a sliding window from tail to front, drop the bases in the           │
 │                               window if its mean quality < threshold, stop otherwise [default: 20]      │
 │--cut_mean_quality INTERGER    The mean quality requirement option shared by cut_front, cut_tail or      │
 │                               cut_sliding. Range: 1~36 [default: 20]                                    │
