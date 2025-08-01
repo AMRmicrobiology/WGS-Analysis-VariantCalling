@@ -52,7 +52,7 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 
 workflow novo {
     preprocess_output = workflow_pre_process()
-    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.accurance_fasta_ch)
+    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.accurance_fasta_ch, preprocess_output.wildtype_only_ch)
     mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch, anotationprocess_output.accurance_fasta_ch)
     /*
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
@@ -125,6 +125,7 @@ workflow workflow_pre_process {
     accurance_fasta_ch
     fq_gz_reads_ch
     personal_ref_ch
+    wildtype_only_ch
 
 }
 
@@ -134,19 +135,17 @@ workflow workflow_anotation_process {
     take:
     accurance_fasta_ch
     personal_ref_ch
+    wildtype_only_ch
 
 
     main:
 
-    anotation_input_ch = personal_ref_ch.first { it[0] == params.wildtype_code }
-    
     //PROKKA
-    prokka_annotation_ch = PROKKA(anotation_input_ch)
-    bakta_annotation_ch = BAKTA(anotation_input_ch)
+    prokka_annotation_ch = PROKKA(wildtype_only_ch)
+    bakta_annotation_ch = BAKTA(wildtype_only_ch)
     
     //merge anotations
-    agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, anotation_input_ch)
-
+    agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, wildtype_only_ch)
 
 }
 
@@ -198,7 +197,6 @@ workflow workflow_mapping_process {
 
     //DESCROMPRES VCF
     vcf_ch = DECOMPRESS_VCF(varaiant_filter_ch.compl_vcf)
-    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
