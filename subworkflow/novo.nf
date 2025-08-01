@@ -54,7 +54,7 @@ workflow novo {
     preprocess_output = workflow_pre_process()
     anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.wildtype_only_ch)
     mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch,
-    anotationprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
+    preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
     anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch)
     
     /*
@@ -115,7 +115,7 @@ workflow workflow_pre_process {
     pilon_polish_ch = PILON_POLISH(polish_data_index_ch)
     accurance_fasta_ch = pilon_polish_ch.pilon_fa
 
-    wildtype_only_ch = accurance_fasta_ch.first { it[0] == params.wildtype_code }
+    wildtype_only_ch = accurance_fasta_ch.filter { it[0] == params.wildtype_code }
 
     // Index build
     personal_ref_ch = wildtype_only_ch
@@ -141,6 +141,7 @@ workflow workflow_anotation_process {
 
 
     main:
+
 
     //PROKKA
     prokka_annotation_ch = PROKKA(wildtype_only_ch)
