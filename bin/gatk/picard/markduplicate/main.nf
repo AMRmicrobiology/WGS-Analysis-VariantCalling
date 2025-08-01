@@ -6,7 +6,8 @@ process MARKDUPLICATE {
     tuple val (sample_id), path(bam)
 
     output:
-    tuple val(sample_id), path("${sample_id}.dedup.bam"), path("${sample_id}.dedup.metrics.txt")
+    tuple val(sample_id), path("${sample_id}.dedup.bam"), path("${sample_id}.dedup.bam.bai"), emit: dedup_bam
+    path("${sample_id}.dedup.metrics.txt")
 
     script:
     """
@@ -16,5 +17,7 @@ process MARKDUPLICATE {
         METRICS_FILE=${sample_id}.dedup.metrics.txt \
         ASSUME_SORT_ORDER=coordinate \
         REMOVE_DUPLICATES=true
+    
+    samtools index ${sample_id}.dedup.bam
     """
 }

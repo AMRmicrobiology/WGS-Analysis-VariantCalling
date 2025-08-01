@@ -52,14 +52,14 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 
 workflow novo {
     preprocess_output = workflow_pre_process()
-    QCprocess_output = workflow_QC_process(preprocess_output.busco_ch, preprocess_output.quast_ch)
-    postprocess_output = workflow_post_process(preprocess_output.personal_ref_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.accurance_fasta_ch)
-    /*amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
+    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.accurance_fasta_ch)
+    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch, anotationprocess_output.accurance_fasta_ch)
+    /*
+    amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
 }
 
 workflow workflow_pre_process {
 
-    take:
     main:
     // Quality control and index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
@@ -89,7 +89,7 @@ workflow workflow_pre_process {
     assemble_denovo_ch = ASSEMBLE(prune_ch)
     contigs_ch = assemble_denovo_ch.contigs
     scaffolds_ch = assemble_denovo_ch.scaffolds
-
+    
     //Filter seq low quality contigs
     filtered_contigs_ch = FILTER_CONTIGS(contigs_ch)
  
@@ -112,106 +112,75 @@ workflow workflow_pre_process {
     pilon_polish_ch = PILON_POLISH(polish_data_index_ch)
     accurance_fasta_ch = pilon_polish_ch.pilon_fa
 
-    //PROKKA
-    prokka_annotation_ch = PROKKA(accurance_fasta_ch)
-    prokka_fna_ch = accurance_fasta_ch.join(prokka_annotation_ch.prokka_path).map {
-        sample_id, contigs, prokka_fna -> 
-        tuple (sample_id, prokka_fna)
-    }
+    wildtype_only_ch = accurance_fasta_ch.first { it[0] == params.wildtype_code }
 
-    wildtype_only_ch = prokka_annotation_ch.prokka_path.filter { it[0] == params.wildtype_code }
-
-    //BAKTA
-    bakta_annotation_ch = BAKTA(prokka_fna_ch)
-
-    //BUSCO
-    busco_ch = BUSCO(accurance_fasta_ch)
-
-    //QUAST
-
-    quast_input_ch = accurance_fasta_ch.join(trimmed_read_ch.trimmed_reads)
-        .map { sample_id, contigs, reads_clean_pair ->
-        def (r1, r2) = reads_clean_pair
-        tuple (sample_id, contigs, [r1, r2])
-    }
-
-    quast_ch = QUAST(quast_input_ch)
-
-    //MULTIQC
-    multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
-    
     // Index build
     personal_ref_ch = wildtype_only_ch
     personal_index_bwa_ch = BUILD_INDEX_1(personal_ref_ch)
     personal_index_ch = PERSONAL_GENOME_INDEX(personal_ref_ch)
 
-    //merge anotations
-    wildtype_prokka_ch = prokka_annotation_ch.prokka_gff.filter { it.endsWith("${params.wildtype_code}.gff") }
-    wildtype_bakta_ch = bakta_annotation_ch.bakta_gff3.filter { it.endsWith("${params.wildtype_code}.gff3") }
-    
-    agt_ch = AGT(wildtype_prokka_ch, wildtype_bakta_ch, personal_ref_ch)
-
     //Emit results
     emit:
-    contigs_ch
     scaffolds_ch
     accurance_fasta_ch
     fq_gz_reads_ch
-    busco_ch
-    quast_ch
     personal_ref_ch
 
 }
 
-workflow workflow_QC_process {
 
-    take:
-    busco_ch
-    quast_ch
+workflow workflow_anotation_process {
 
-    main:
-    multiqc_2_ch = POST_MULTIQC(quast_ch.map{ it -> it[1] }.collect(), busco_ch.map{ it -> it[1] }.collect())
-
-}
-
-
-workflow workflow_post_process {
-    
     take:
     accurance_fasta_ch
+    personal_ref_ch
+
+
+    main:
+
+    anotation_input_ch = personal_ref_ch.first { it[0] == params.wildtype_code }
+    
+    //PROKKA
+    prokka_annotation_ch = PROKKA(anotation_input_ch)
+    bakta_annotation_ch = BAKTA(anotation_input_ch)
+    
+    //merge anotations
+    agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, anotation_input_ch)
+
+
+}
+
+workflow workflow_mapping_process {
+
+    take:
     fq_gz_reads_ch
     personal_ref_ch
-        
+    accurance_fasta_ch
+
     main:
-    //Mapping process- Mapping used Specie ref. genome, include samtools sorted
+
+    //mapping process- Mapping used Specie ref. genome, include samtools sorted
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
 
     //Add groups and Mark duplicates
-    bam_ch = specie_mapping_ch.map {
-        tupla -> 
-        def sample_id = tupla [0]
-        def bam_path = tupla [2]
-        return tuple (sample_id, bam_path)
-    }
 
-    gatk_mark_ch = MARKDUPLICATE (bam_ch)
-    
-    //Add or replace groups
-    replace_ch = gatk_mark_ch.map {
-        tupla -> 
-        def sample_id = tupla [0]
-        def replace_bam = tupla [1]
-        return tuple (sample_id, replace_bam)
+    bam_ch = specie_mapping_ch.all_outputs.map { sample_id, sam, bam, bai, metrics, flagstat -> 
+    tuple(sample_id, bam)
     }
+    //Add or replace read groups
+    gatk_add_ch = ADDORREPLACE(bam_ch)
     
-    gatk_add_ch = ADDORREPLACE(replace_ch)
-
- 
+    //Mark duplicates
+    gatk_mark_ch = MARKDUPLICATE (gatk_add_ch)
+   
+    //GATK PROCESS
+    //GATK PREPARE CHANNEL
+    replace_ch = gatk_mark_ch.dedup_bam
     //HAPLOTYPECALLER
     // realignment consistently incluide in the algoritme of GATK HaplotypeCaller.
     // minimum quality and confidence threshold are included
-    gatk_haplotype_ch = HAPLOTYPECALLER (gatk_add_ch, personal_ref_ch)
- 
+    gatk_haplotype_ch = HAPLOTYPECALLER (replace_ch, personal_ref_ch)
+   
     //GenotypeCaller 
     //Perform joint genotyping 
     gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch , personal_ref_ch)
@@ -226,31 +195,11 @@ workflow workflow_post_process {
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
     varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, personal_ref_ch)
-/*
+
     //DESCROMPRES VCF
     vcf_ch = DECOMPRESS_VCF(varaiant_filter_ch.compl_vcf)
-
-    //SNPeFF
-    //Funcional anotations
-    snpeff_ch = SNPEFF(agt_ch.combine_gff3, personal_ref_ch, params.genome_name_db, agt_ch.protein_fasta, agt_ch.cds_fasta, vcf_ch)
-*/
-}
-
-/*
-workflow workflow_amr {
-    take:
-    contigs_ch
     
-    main:
-    //AMR
-    //AMR1-ABRIcate
-    abricate_ch = POST_ANALYSIS_ABRICATE(contigs_ch, params.organism)
-
-    //AMR2-RESFINDER
-    resfinder_ch = POST_ANALYSIS_AMRFINDER(contigs_ch)
-
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS                                                                  //

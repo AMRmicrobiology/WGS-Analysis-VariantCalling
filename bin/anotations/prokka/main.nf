@@ -20,10 +20,10 @@ process PROKKA {
     path "annotations_${sample_id}/${sample_id}.gff", emit: prokka_gff
     path "annotations_${sample_id}/${sample_id}.faa", emit: prokka_faa
     path "annotations_${sample_id}/${sample_id}.fna", emit: prokka_fna
-    tuple val(sample_id), path("annotations_${sample_id}/${sample_id}.fna"), emit: prokka_path
 
     script:
     """
     prokka --outdir annotations_${sample_id} --prefix ${sample_id} --kingdom Bacteria --compliant ${assembly_file}
+    
     """
 }
