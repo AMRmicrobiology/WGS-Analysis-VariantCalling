@@ -52,8 +52,11 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 
 workflow novo {
     preprocess_output = workflow_pre_process()
-    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.accurance_fasta_ch, preprocess_output.wildtype_only_ch)
-    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch, anotationprocess_output.accurance_fasta_ch)
+    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.wildtype_only_ch)
+    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch,
+    anotationprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
+    anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch)
+    
     /*
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
 }
@@ -133,7 +136,6 @@ workflow workflow_pre_process {
 workflow workflow_anotation_process {
 
     take:
-    accurance_fasta_ch
     personal_ref_ch
     wildtype_only_ch
 
@@ -147,6 +149,14 @@ workflow workflow_anotation_process {
     //merge anotations
     agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, wildtype_only_ch)
 
+    agt_gff_input_ch = agt_ch.combine_gff3
+    agt_protein_input_ch = agt_ch.protein_fasta
+    agt_cds_input_ch = agt_ch.cds_fasta
+
+    emit:
+    agt_cds_input_ch
+    agt_protein_input_ch
+    agt_gff_input_ch
 }
 
 workflow workflow_mapping_process {
@@ -155,6 +165,9 @@ workflow workflow_mapping_process {
     fq_gz_reads_ch
     personal_ref_ch
     accurance_fasta_ch
+    agt_cds_input_ch
+    agt_protein_input_ch
+    agt_gff_input_ch
 
     main:
 
@@ -197,7 +210,13 @@ workflow workflow_mapping_process {
 
     //DESCROMPRES VCF
     vcf_ch = DECOMPRESS_VCF(varaiant_filter_ch.compl_vcf)
+    
+    //SNPeFF
+    //Funcional anotations
+    snpeff_ch = SNPEFF(agt_gff_input_ch, personal_ref_ch, params.genome_name_db, agt_protein_input_ch, agt_cds_input_ch, vcf_ch)
+
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS                                                                  //
