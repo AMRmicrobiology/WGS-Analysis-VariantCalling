@@ -9,8 +9,7 @@ process HAPLOTYPECALLER {
     container "$params.gatk4.docker"
 
     input:
-    tuple val (sample_id), path (bam)
-    tuple val(barcode), path (reference)
+    tuple val (sample_id), path (bam), val(wt), path (reference)
 
     output:
     tuple val (sample_id), path("${sample_id}.g.vcf.gz")

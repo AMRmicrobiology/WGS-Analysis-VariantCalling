@@ -7,13 +7,9 @@ process SNPEFF {
     container "$params.snpeff.docker"
 
     input:
-    path gff3_file
-    tuple val(id_reference), path(assembly_file)
+    tuple val(new_id), path(variants_vcf), val(id_reference), path(assembly_file), path(gff3_file) ,path(protein_fasta), path(cds_fasta)
     val genome_name_db
-    path protein_fasta
-    path cds_fasta
-    tuple val(new_id), path(variants_vcf)
-
+    
     output:
     path "annotated_${new_id}_variants.vcf", emit: annotated_vcf
 

@@ -186,35 +186,45 @@ workflow workflow_mapping_process {
     //Mark duplicates
     gatk_mark_ch = MARKDUPLICATE (gatk_add_ch)
    
-    //GATK PROCESS
-    //GATK PREPARE CHANNEL
-    replace_ch = gatk_mark_ch.dedup_bam
     //HAPLOTYPECALLER
     // realignment consistently incluide in the algoritme of GATK HaplotypeCaller.
     // minimum quality and confidence threshold are included
-    gatk_haplotype_ch = HAPLOTYPECALLER (replace_ch, personal_ref_ch)
-   
+
+    haplotype_input_ch = gatk_mark_ch.dedup_bam.combine(personal_ref_ch)
+    gatk_haplotype_ch = HAPLOTYPECALLER (haplotype_input_ch)
+
     //GenotypeCaller 
     //Perform joint genotyping 
-    gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch , personal_ref_ch)
+    gatk_input_genotype_ch = gatk_haplotype_ch.combine(personal_ref_ch)
+    gatk_genotype_ch = GENOTYPE_ANALYSIS ( gatk_input_genotype_ch)
 
     //Align
     //This tool takes a VCF file, left-aligns the indels and trims common bases from indels, leaving them with a minimum representation.
     //The same indel can often be placed at multiple positions and still represent the same haplotype.
     //We are going to take the optionally splits multiallelic sites into biallelics and left-aligns individual alleles.
-    aligns_and_normalized_ch = NORMALICE_WILDTYPE (gatk_genotype_ch, personal_ref_ch)
+    aligns_input_ch = gatk_genotype_ch.combine(personal_ref_ch)
+    aligns_and_normalized_ch = NORMALICE_WILDTYPE (aligns_input_ch)
 
     //VatiantFilter
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
-    varaiant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, personal_ref_ch)
+    varaiant_input_ch = aligns_and_normalized_ch.combine(personal_ref_ch)
+    varaiant_filter_ch = FILTER_VARIANTS_PARAM (varaiant_input_ch)
 
     //DESCROMPRES VCF
     vcf_ch = DECOMPRESS_VCF(varaiant_filter_ch.compl_vcf)
     
+   
     //SNPeFF
     //Funcional anotations
-    snpeff_ch = SNPEFF(agt_gff_input_ch, personal_ref_ch, params.genome_name_db, agt_protein_input_ch, agt_cds_input_ch, vcf_ch)
+    snpeff_config_ch = personal_ref_ch
+        .combine(agt_gff_input_ch)
+        .combine(agt_protein_input_ch)
+        .combine(agt_cds_input_ch)
+
+    snpeff_input_ch = vcf_ch.combine(snpeff_config_ch)
+
+    snpeff_ch = SNPEFF(snpeff_input_ch, params.genome_name_db)
 
 }
 

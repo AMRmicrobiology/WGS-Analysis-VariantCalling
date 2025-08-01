@@ -6,7 +6,7 @@ process MARKDUPLICATE {
     tuple val (sample_id), path(bam)
 
     output:
-    tuple val(sample_id), path("${sample_id}.dedup.bam"), path("${sample_id}.dedup.bam.bai"), emit: dedup_bam
+    tuple val(sample_id), path("${sample_id}.dedup.bam"), emit: dedup_bam
     path("${sample_id}.dedup.metrics.txt")
 
     script:
