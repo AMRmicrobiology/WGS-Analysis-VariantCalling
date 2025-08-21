@@ -49,7 +49,7 @@ process AGT {
 
     # Validar consistencia con el FASTA (seqid)
     grep "^>" ${assembly_file} | sed 's/^>//' | sort > ids_fasta.txt
-    grep -v "^#" filtered_${sample_id}.gff3 | cut -f1 | sort | uniq > ids_gff.txt
+    awk '\$0 ~ /^#/ {next} \$0 ~ /^>/ {exit} {print \$1}' filtered_${sample_id}.gff3 | sort | uniq > ids_gff.txt
     comm -23 ids_gff.txt ids_fasta.txt > mismatched_ids.txt || true
 
     # Si hay diferencias, renombrar seqid con mapeo invertido

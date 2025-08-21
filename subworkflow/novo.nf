@@ -52,11 +52,12 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 
 workflow novo {
     preprocess_output = workflow_pre_process()
-    anotationprocess_output = workflow_anotation_process(preprocess_output.personal_ref_ch, preprocess_output.wildtype_only_ch)
-    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.personal_ref_ch,
-    preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
-    anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch)
+    anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch)
     
+    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.wildtype_only_ch,
+    preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
+    anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
+    preprocess_output.personal_index_ch)
     /*
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
 }
@@ -118,31 +119,24 @@ workflow workflow_pre_process {
     wildtype_only_ch = accurance_fasta_ch.filter { it[0] == params.wildtype_code }
 
     // Index build
-    personal_ref_ch = wildtype_only_ch
-    personal_index_bwa_ch = BUILD_INDEX_1(personal_ref_ch)
-    personal_index_ch = PERSONAL_GENOME_INDEX(personal_ref_ch)
+    personal_index_ch = PERSONAL_GENOME_INDEX(wildtype_only_ch)
 
     //Emit results
     emit:
-    scaffolds_ch
     accurance_fasta_ch
     fq_gz_reads_ch
-    personal_ref_ch
     wildtype_only_ch
+    personal_index_ch
 
 }
-
 
 workflow workflow_anotation_process {
 
     take:
-    personal_ref_ch
     wildtype_only_ch
 
-
     main:
-
-
+    
     //PROKKA
     prokka_annotation_ch = PROKKA(wildtype_only_ch)
     bakta_annotation_ch = BAKTA(wildtype_only_ch)
@@ -164,16 +158,19 @@ workflow workflow_mapping_process {
 
     take:
     fq_gz_reads_ch
-    personal_ref_ch
+    wildtype_only_ch
     accurance_fasta_ch
     agt_cds_input_ch
     agt_protein_input_ch
     agt_gff_input_ch
+    personal_index_ch
 
     main:
 
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
-    specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
+    
+    mapping_input_ch = fq_gz_reads_ch.combine(personal_index_ch)
+    specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
 
     //Add groups and Mark duplicates
 
@@ -190,25 +187,25 @@ workflow workflow_mapping_process {
     // realignment consistently incluide in the algoritme of GATK HaplotypeCaller.
     // minimum quality and confidence threshold are included
 
-    haplotype_input_ch = gatk_mark_ch.dedup_bam.combine(personal_ref_ch)
+    haplotype_input_ch = gatk_mark_ch.dedup_bam.combine(wildtype_only_ch)
     gatk_haplotype_ch = HAPLOTYPECALLER (haplotype_input_ch)
 
     //GenotypeCaller 
     //Perform joint genotyping 
-    gatk_input_genotype_ch = gatk_haplotype_ch.combine(personal_ref_ch)
+    gatk_input_genotype_ch = gatk_haplotype_ch.combine(wildtype_only_ch)
     gatk_genotype_ch = GENOTYPE_ANALYSIS ( gatk_input_genotype_ch)
 
     //Align
     //This tool takes a VCF file, left-aligns the indels and trims common bases from indels, leaving them with a minimum representation.
     //The same indel can often be placed at multiple positions and still represent the same haplotype.
     //We are going to take the optionally splits multiallelic sites into biallelics and left-aligns individual alleles.
-    aligns_input_ch = gatk_genotype_ch.combine(personal_ref_ch)
+    aligns_input_ch = gatk_genotype_ch.combine(wildtype_only_ch)
     aligns_and_normalized_ch = NORMALICE_WILDTYPE (aligns_input_ch)
 
     //VatiantFilter
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
-    varaiant_input_ch = aligns_and_normalized_ch.combine(personal_ref_ch)
+    varaiant_input_ch = aligns_and_normalized_ch.combine(wildtype_only_ch)
     varaiant_filter_ch = FILTER_VARIANTS_PARAM (varaiant_input_ch)
 
     //DESCROMPRES VCF
@@ -217,7 +214,7 @@ workflow workflow_mapping_process {
    
     //SNPeFF
     //Funcional anotations
-    snpeff_config_ch = personal_ref_ch
+    snpeff_config_ch = wildtype_only_ch
         .combine(agt_gff_input_ch)
         .combine(agt_protein_input_ch)
         .combine(agt_cds_input_ch)
@@ -225,9 +222,8 @@ workflow workflow_mapping_process {
     snpeff_input_ch = vcf_ch.combine(snpeff_config_ch)
 
     snpeff_ch = SNPEFF(snpeff_input_ch, params.genome_name_db)
-
+   
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS                                                                  //

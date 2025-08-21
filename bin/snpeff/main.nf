@@ -15,6 +15,7 @@ process SNPEFF {
 
     script:
     """
+    
     mkdir -p /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/data/${genome_name_db}
 
     cp ${assembly_file} /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/data/${genome_name_db}/sequences.fa
@@ -28,5 +29,6 @@ process SNPEFF {
     snpEff build -gff3 -v ${genome_name_db}
 
     snpEff ann -noLog -noStats -no-upstream -no-downstream -no-utr -c /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/snpEff.config -o vcf ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
+    
     """
 }

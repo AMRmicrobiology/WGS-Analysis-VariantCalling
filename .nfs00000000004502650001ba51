@@ -1,0 +1,235 @@
+Aug-05 16:28:09.932 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf --mode novo --input '/PROJECTES/MICROBIOLOGIA/ILLUMINA/NURIA_PLP3/0_raw_data/Kp145*_{1,2}.fastq.gz' --wildtype_code Kp145_wt --genome_name_db Klebsiella_pneumoniae_145 --organism 'Klebsiella pneumoniae' -w /scratch/jlucas/VC_145 -profile docker -resume
+Aug-05 16:28:10.175 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.3
+Aug-05 16:28:10.196 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/isglobal.lan/jlucas/.nextflow/plugins; core-plugins: nf-amazon@2.15.0,nf-azure@1.16.0,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.0,nf-k8s@1.0.0,nf-tower@1.11.3,nf-wave@1.12.1
+Aug-05 16:28:10.240 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Aug-05 16:28:10.241 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Aug-05 16:28:10.244 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Aug-05 16:28:10.254 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Aug-05 16:28:10.272 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/nextflow.config
+Aug-05 16:28:10.273 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/nextflow.config
+Aug-05 16:28:10.300 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/isglobal.lan/jlucas/.nextflow/secrets/store.json
+Aug-05 16:28:10.328 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@4d6f197e] - activable => nextflow.secret.LocalSecretsProvider@4d6f197e
+Aug-05 16:28:10.340 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `docker`
+Aug-05 16:28:10.987 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [conda, hpc, docker]
+Aug-05 16:28:11.044 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Aug-05 16:28:11.057 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [ecstatic_magritte] DSL2 - revision: 230867cff9
+Aug-05 16:28:11.059 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Aug-05 16:28:11.059 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Aug-05 16:28:11.128 [main] DEBUG nextflow.Session - Session UUID: e0a816c2-c6e2-4837-8381-29a9e3f7843e
+Aug-05 16:28:11.129 [main] DEBUG nextflow.Session - Run name: ecstatic_magritte
+Aug-05 16:28:11.129 [main] DEBUG nextflow.Session - Executor pool size: 128
+Aug-05 16:28:11.137 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Aug-05 16:28:11.141 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=384; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Aug-05 16:28:11.166 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.3 build 5949
+  Created: 02-06-2025 20:56 UTC (22:56 CEST)
+  System: Linux 5.14.0-503.40.1.el9_5.x86_64
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.15+6-LTS
+  Encoding: UTF-8 (UTF-8)
+  Process: 1105297@balboa.isglobal.lan [172.20.10.130]
+  CPUs: 128 - Mem: 1006.9 GB (11.9 GB) - Swap: 32 GB (31.3 GB)
+Aug-05 16:28:11.748 [main] DEBUG nextflow.Session - Work-dir: /scratch/jlucas/VC_145 [xfs]
+Aug-05 16:28:11.776 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Aug-05 16:28:11.783 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Aug-05 16:28:11.815 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Aug-05 16:28:11.838 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Aug-05 16:28:11.844 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 129; maxThreads: 1000
+Aug-05 16:28:11.952 [main] DEBUG nextflow.Session - Session start
+Aug-05 16:28:11.955 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/data/out/report/DVT_trace.txt
+Aug-05 16:28:12.157 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Aug-05 16:28:12.457 [main] INFO  nextflow.Nextflow - 
+WGS - P A R A M E T R E S
+==============================================
+Configuration environemnt:
+    Out directory:             /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/data/out
+    Fastq directory:           /PROJECTES/MICROBIOLOGIA/ILLUMINA/NURIA_PLP3/0_raw_data/Kp145*_{1,2}.fastq.gz
+    Reference directory:       /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/data/reference_genome
+    DB SNPeFF name:            Klebsiella_pneumoniae_145
+
+Aug-05 16:28:15.134 [main] INFO  nextflow.Nextflow - 
+    ==============================================
+            WGS - N F   P I P E L I N E 
+    ==============================================
+    Running mode(s): novo
+    Configuration environemnt:
+    Out directory:             /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/data/out
+    Fastq directory:           /PROJECTES/MICROBIOLOGIA/ILLUMINA/NURIA_PLP3/0_raw_data/Kp145*_{1,2}.fastq.gz
+    Reference directory:       /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/data/reference_genome
+    
+Aug-05 16:28:15.253 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.253 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.258 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Aug-05 16:28:15.263 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=128; memory=1006.9 GB; capacity=128; pollInterval=100ms; dumpInterval=5m
+Aug-05 16:28:15.265 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Aug-05 16:28:15.297 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.369 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.369 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.371 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:TRIMMING': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.378 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.378 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.380 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:KRAKEN': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.384 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.385 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.386 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:FASTQC_QUALITY_FINAL': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.397 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.398 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.399 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:SEQTK_PRUNE': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.428 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.428 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.429 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:ASSEMBLE': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.434 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.435 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.436 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:FILTER_CONTIGS': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.449 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.449 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.451 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:ALIGMENT_PILON': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.468 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.468 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.469 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:PILON_POLISH': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.482 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.482 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.483 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_pre_process:BUILD_INDEX_1': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.495 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.496 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.496 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_anotation_process:PROKKA': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.533 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.533 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.535 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_anotation_process:BAKTA': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.544 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.544 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.545 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_anotation_process:AGT': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.553 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.553 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.554 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_mapping_process:PERSONAL_GENOME_INDEX': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.565 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Aug-05 16:28:15.565 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Aug-05 16:28:15.566 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'novo:workflow_mapping_process:PERSONAL_GENOME_MAPPING': maxForks=6; fair=false; array=0
+Aug-05 16:28:15.569 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: novo:workflow_pre_process:SEQTK_PRUNE, BUSCO, novo:workflow_pre_process:ASSEMBLE, DECOMPRESS_VCF, novo:workflow_pre_process:FASTQC_QUALITY_FINAL, MRSA, PROKKA, SEQTK_PRUNE, BAKTA, ALIGMENT_PILON, novo:workflow_pre_process:PILON_POLISH, novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL, QUAST, BUILD_INDEX, AMR, KRAKEN, novo:workflow_pre_process:FILTER_CONTIGS, SCCMEC, novo:workflow_anotation_process:BAKTA, novo:workflow_anotation_process:PROKKA, FASTQC_QUALITY_FINAL, FILTER_CONTIGS, novo:workflow_pre_process:BUILD_INDEX_1, ASSEMBLE, novo:workflow_pre_process:KRAKEN, GENOTYPE_ANALYSIS, novo:workflow_pre_process:ALIGMENT_PILON, MARKDUPLICATE, POST_MULTIQC, PERSONAL_GENOME_INDEX, SNPEFF, GENOTYPE, POST_ANALYSIS_ABRICATE, MULTIQC, FILTER_VARIANTS_PARAM, novo:workflow_anotation_process:AGT, ARIBA, FASTQC_QUALITY, ALIGN, ADDORREPLACE, BUILD_INDEX_1, HAPLOTYPECALLER, FILTER_VARIANTS, AMR_2, TRIMMING, MLST, FASTQC_QUALITY_ORIGINAL, NORMALISE_DATA, MULTIQC_2, PILON_POLISH, novo:workflow_mapping_process:PERSONAL_GENOME_INDEX, POST_ANALYSIS_AMRFINDER, AGT, EXTRACT_CDS_FROM_BAKTA, novo:workflow_pre_process:TRIMMING, novo:workflow_mapping_process:PERSONAL_GENOME_MAPPING, PERSONAL_GENOME_MAPPING, NORMALICE_WILDTYPE
+Aug-05 16:28:15.571 [main] DEBUG nextflow.Session - Igniting dataflow network (16)
+Aug-05 16:28:15.574 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: /PROJECTES/MICROBIOLOGIA/ILLUMINA/NURIA_PLP3/0_raw_data/; pattern: Kp145*_{1,2}.fastq.gz; options: [:]
+Aug-05 16:28:15.575 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL
+Aug-05 16:28:15.575 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:TRIMMING
+Aug-05 16:28:15.575 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:KRAKEN
+Aug-05 16:28:15.576 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL
+Aug-05 16:28:15.576 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:SEQTK_PRUNE
+Aug-05 16:28:15.576 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:ASSEMBLE
+Aug-05 16:28:15.576 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:FILTER_CONTIGS
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:ALIGMENT_PILON
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:PILON_POLISH
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_pre_process:BUILD_INDEX_1
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_anotation_process:PROKKA
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_anotation_process:BAKTA
+Aug-05 16:28:15.577 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_anotation_process:AGT
+Aug-05 16:28:15.578 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_mapping_process:PERSONAL_GENOME_INDEX
+Aug-05 16:28:15.578 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > novo:workflow_mapping_process:PERSONAL_GENOME_MAPPING
+Aug-05 16:28:15.579 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_4cd91891449a56a3: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/quast/main.nf
+  Script_6c2bee164b0e470e: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/main.nf
+  Script_49accb38f72959bc: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/busco/main.nf
+  Script_237d9315b4d91c5f: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/fastqc/main.nf
+  Script_aafe3f74af70e0f3: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/anotations/prokka/main.nf
+  Script_28de050a8841c472: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/snpeff/main.nf
+  Script_fdddef81f272ecdc: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/anotations/bakta/main_2.nf
+  Script_4c2eccd172bf2753: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/AMR/AMRFinder/main.nf
+  Script_3dd17cdf2e1cab0b: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/polish/filter.nf
+  Script_a665c211bfa5f1c1: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/Filter/align.nf
+  Script_ab250d663dd1426d: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/bowtie/index/main.nf
+  Script_8f8ada9f096ce89c: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/AMR/abricate/main.nf
+  Script_a4d14b3523ce519a: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/subworkflow/assemble.nf
+  Script_7b90350253d80e33: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/mlst/main.nf
+  Script_be4edb33456b0af1: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/mrsa/main.nf
+  Script_b9bc937e2fbe9e1c: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/mlst/main_2.nf
+  Script_c69a8ba01d8ff2fd: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/anotations/prokka/main_2.nf
+  Script_01a079f912f2a840: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/bowtie/index/main_bwa.nf
+  Script_644faa6a2b8c6d58: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/polish/main.nf
+  Script_48abe2280c1efd84: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/snpeff/main_3.nf
+  Script_abeface40d5df47a: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/picard/addorreplace/main.nf
+  Script_ed2968d857ee6c59: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/multiqc/main_2.nf
+  Script_40d89608ed70cb61: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/kraken/main.nf
+  Script_49c9d903ccca48b7: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/assemble/main.nf
+  Script_29730158bb88bdde: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/qc/multiqc/main.nf
+  Script_597cdddf7b742b1d: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/snpeff/main_2.nf
+  Script_3c7b14a539de40b3: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/bowtie/mapping/main.nf
+  Script_4e544dc51e02eb57: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/anotations/bakta/main.nf
+  Script_323cc4c6d7f2195d: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/haplotype/main_1.nf
+  Script_bf780b90f758e4af: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/anotations/main.nf
+  Script_7cd084f867b64cb9: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/subworkflow/reference.nf
+  Script_bdd873245d6e5f49: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/genotype/main.nf
+  Script_17baf10a8398433a: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/trimming/main.nf
+  Script_8b46aaa96bec7e6e: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/Filter/main.nf
+  Script_91d130381442ab0a: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/subworkflow/novo.nf
+  Script_10299f32e71c9a14: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/haplotype/main_3.nf
+  Script_b52f9567c651d050: /PROJECTES/MICROBIOLOGIA/GITHUB/WGS-Analysis-VariantCalling/bin/gatk/picard/markduplicate/main.nf
+Aug-05 16:28:15.579 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Aug-05 16:28:15.580 [main] DEBUG nextflow.Session - Session await
+Aug-05 16:28:15.824 [Actor Thread 69] INFO  nextflow.processor.TaskProcessor - [e5/d04f2b] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 50] INFO  nextflow.processor.TaskProcessor - [c8/98c6a2] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_2)
+Aug-05 16:28:15.824 [Actor Thread 59] INFO  nextflow.processor.TaskProcessor - [17/c4fdc7] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_6)
+Aug-05 16:28:15.824 [Actor Thread 45] INFO  nextflow.processor.TaskProcessor - [33/ec48c2] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 63] INFO  nextflow.processor.TaskProcessor - [b6/b36f3f] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_7)
+Aug-05 16:28:15.824 [Actor Thread 54] INFO  nextflow.processor.TaskProcessor - [37/f42569] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_5)
+Aug-05 16:28:15.824 [Actor Thread 67] INFO  nextflow.processor.TaskProcessor - [bc/a40702] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_8)
+Aug-05 16:28:15.824 [Actor Thread 46] INFO  nextflow.processor.TaskProcessor - [b8/6fc630] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_1)
+Aug-05 16:28:15.824 [Actor Thread 57] INFO  nextflow.processor.TaskProcessor - [32/7bdfea] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 49] INFO  nextflow.processor.TaskProcessor - [f5/5e7d75] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 53] INFO  nextflow.processor.TaskProcessor - [a0/8f1030] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 65] INFO  nextflow.processor.TaskProcessor - [a5/835342] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.824 [Actor Thread 70] INFO  nextflow.processor.TaskProcessor - [a1/7f534b] Cached process > novo:workflow_pre_process:TRIMMING (fastp Kp145_wt)
+Aug-05 16:28:15.824 [Actor Thread 60] INFO  nextflow.processor.TaskProcessor - [97/725a13] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_ORIGINAL (FASTQC)
+Aug-05 16:28:15.858 [Actor Thread 94] INFO  nextflow.processor.TaskProcessor - [a1/b3446f] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.861 [Actor Thread 119] INFO  nextflow.processor.TaskProcessor - [3a/efdf83] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.861 [Actor Thread 104] INFO  nextflow.processor.TaskProcessor - [ca/5ab733] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.861 [Actor Thread 90] INFO  nextflow.processor.TaskProcessor - [db/469cbe] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.861 [Actor Thread 110] INFO  nextflow.processor.TaskProcessor - [27/0751f3] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.864 [Actor Thread 124] INFO  nextflow.processor.TaskProcessor - [c9/6d2472] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.865 [Actor Thread 34] INFO  nextflow.processor.TaskProcessor - [d2/fcd7ba] Cached process > novo:workflow_pre_process:FASTQC_QUALITY_FINAL (FASTQC)
+Aug-05 16:28:15.865 [Actor Thread 83] INFO  nextflow.processor.TaskProcessor - [34/42e8b3] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_wt)
+Aug-05 16:28:15.866 [Actor Thread 100] INFO  nextflow.processor.TaskProcessor - [3b/d29531] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_5)
+Aug-05 16:28:15.865 [Actor Thread 112] INFO  nextflow.processor.TaskProcessor - [95/7255b5] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_1)
+Aug-05 16:28:15.866 [Actor Thread 59] INFO  nextflow.processor.TaskProcessor - [13/092d70] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_2)
+Aug-05 16:28:15.866 [Actor Thread 95] INFO  nextflow.processor.TaskProcessor - [89/5a71a5] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_8)
+Aug-05 16:28:15.866 [Actor Thread 105] INFO  nextflow.processor.TaskProcessor - [a3/788821] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_7)
+Aug-05 16:28:15.866 [Actor Thread 123] INFO  nextflow.processor.TaskProcessor - [e8/5a8095] Cached process > novo:workflow_pre_process:KRAKEN (Kp145_6)
+Aug-05 16:28:15.883 [Actor Thread 123] INFO  nextflow.processor.TaskProcessor - [b3/d918de] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_wt)
+Aug-05 16:28:15.883 [Actor Thread 59] INFO  nextflow.processor.TaskProcessor - [2b/01fa7e] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_7)
+Aug-05 16:28:15.884 [Actor Thread 83] INFO  nextflow.processor.TaskProcessor - [ca/3ba88e] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_8)
+Aug-05 16:28:15.884 [Actor Thread 105] INFO  nextflow.processor.TaskProcessor - [9a/15a648] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_6)
+Aug-05 16:28:15.884 [Actor Thread 128] INFO  nextflow.processor.TaskProcessor - [3b/e35285] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_5)
+Aug-05 16:28:15.884 [Actor Thread 95] INFO  nextflow.processor.TaskProcessor - [a1/d36961] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_2)
+Aug-05 16:28:15.884 [Actor Thread 34] INFO  nextflow.processor.TaskProcessor - [bc/70f0fe] Cached process > novo:workflow_pre_process:SEQTK_PRUNE (Kp145_1)
+Aug-05 16:28:15.896 [Actor Thread 110] INFO  nextflow.processor.TaskProcessor - [92/3a3f55] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_5)
+Aug-05 16:28:15.896 [Actor Thread 94] INFO  nextflow.processor.TaskProcessor - [34/1ae731] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_1)
+Aug-05 16:28:15.896 [Actor Thread 95] INFO  nextflow.processor.TaskProcessor - [5f/89b2e6] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_2)
+Aug-05 16:28:15.896 [Actor Thread 124] INFO  nextflow.processor.TaskProcessor - [ab/9670b6] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_8)
+Aug-05 16:28:15.896 [Actor Thread 59] INFO  nextflow.processor.TaskProcessor - [59/a1186a] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_7)
+Aug-05 16:28:15.896 [Actor Thread 128] INFO  nextflow.processor.TaskProcessor - [2f/3d1cab] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_6)
+Aug-05 16:28:15.896 [Actor Thread 123] INFO  nextflow.processor.TaskProcessor - [ce/9bd39c] Cached process > novo:workflow_pre_process:ASSEMBLE (Spades Kp145_wt)
+Aug-05 16:28:15.928 [Actor Thread 105] INFO  nextflow.processor.TaskProcessor - [ec/9fa0bc] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_6)
+Aug-05 16:28:15.928 [Actor Thread 112] INFO  nextflow.processor.TaskProcessor - [b5/555e79] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_8)
+Aug-05 16:28:15.928 [Actor Thread 90] INFO  nextflow.processor.TaskProcessor - [54/fe3f7d] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_7)
+Aug-05 16:28:15.928 [Actor Thread 50] INFO  nextflow.processor.TaskProcessor - [cb/fe2fd5] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_1)
+Aug-05 16:28:15.928 [Actor Thread 104] INFO  nextflow.processor.TaskProcessor - [b2/a37ee0] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_wt)
+Aug-05 16:28:15.928 [Actor Thread 83] INFO  nextflow.processor.TaskProcessor - [09/ef0bc1] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_5)
+Aug-05 16:28:15.929 [Actor Thread 119] INFO  nextflow.processor.TaskProcessor - [ef/c2ace0] Cached process > novo:workflow_pre_process:FILTER_CONTIGS (FILTER | Kp145_2)
+Aug-05 16:28:15.939 [Actor Thread 59] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=384; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Aug-05 16:28:15.944 [Actor Thread 83] INFO  nextflow.processor.TaskProcessor - [7b/91c9bb] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_2)
+Aug-05 16:28:15.944 [Actor Thread 104] INFO  nextflow.processor.TaskProcessor - [34/c97ec2] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_wt)
+Aug-05 16:28:15.944 [Actor Thread 50] INFO  nextflow.processor.TaskProcessor - [0f/2b8528] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_1)
+Aug-05 16:28:15.944 [Actor Thread 127] INFO  nextflow.processor.TaskProcessor - [d3/1c1e43] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_6)
+Aug-05 16:28:15.944 [Actor Thread 90] INFO  nextflow.processor.TaskProcessor - [9b/6f5fad] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_8)
+Aug-05 16:28:15.944 [Actor Thread 93] INFO  nextflow.processor.TaskProcessor - [d2/b85d42] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_5)
+Aug-05 16:28:15.944 [Actor Thread 126] INFO  nextflow.processor.TaskProcessor - [7c/a8b0f2] Cached process > novo:workflow_pre_process:ALIGMENT_PILON (ALIGMENT | Kp145_7)
+Aug-05 16:28:15.975 [Actor Thread 127] INFO  nextflow.processor.TaskProcessor - [ef/104b6e] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_1)
+Aug-05 16:28:15.975 [Actor Thread 124] INFO  nextflow.processor.TaskProcessor - [56/e9e32d] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_2)
+Aug-05 16:28:15.975 [Actor Thread 93] INFO  nextflow.processor.TaskProcessor - [5e/04c0b6] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_5)
+Aug-05 16:28:15.977 [Actor Thread 126] INFO  nextflow.processor.TaskProcessor - [f2/719d15] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_6)
+Aug-05 16:28:15.977 [Actor Thread 95] INFO  nextflow.processor.TaskProcessor - [7d/6e400c] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_8)
+Aug-05 16:28:15.977 [Actor Thread 90] INFO  nextflow.processor.TaskProcessor - [c8/afb049] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_7)
+Aug-05 16:28:15.977 [Actor Thread 104] INFO  nextflow.processor.TaskProcessor - [60/63bf86] Cached process > novo:workflow_pre_process:PILON_POLISH (PILON | Kp145_wt)
+Aug-05 16:28:15.991 [Actor Thread 83] INFO  nextflow.processor.TaskProcessor - [e2/9a31a1] Cached process > novo:workflow_mapping_process:PERSONAL_GENOME_INDEX (Index-ReferenceGenome Kp145_wt.fasta)
+Aug-05 16:28:15.992 [Actor Thread 110] INFO  nextflow.processor.TaskProcessor - [c6/64d0e5] Cached process > novo:workflow_anotation_process:PROKKA (PROKKA ANNOTATION)
+Aug-05 16:28:15.992 [Actor Thread 94] INFO  nextflow.processor.TaskProcessor - [97/5b80b8] Cached process > novo:workflow_pre_process:BUILD_INDEX_1 (index)
+Aug-05 16:28:15.993 [Actor Thread 126] INFO  nextflow.processor.TaskProcessor - [bd/1dada1] Cached process > novo:workflow_anotation_process:BAKTA (BAKTA ANNOTATIONS)
+Aug-05 16:28:16.045 [Actor Thread 50] INFO  nextflow.processor.TaskProcessor - [76/28e681] Cached process > novo:workflow_anotation_process:AGT (MERGE ANNOTATIONS)
+Aug-05 16:28:16.093 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Aug-05 16:28:16.095 [Task submitter] INFO  nextflow.Session - [68/f57e77] Submitted process > novo:workflow_mapping_process:PERSONAL_GENOME_MAPPING (Mapping_personal_ref vs Kp145_wt)
