@@ -1,6 +1,3 @@
-/*
-DSL2 channels
-*/
 nextflow.enable.dsl=2
 
 checkInputParams()
@@ -29,7 +26,7 @@ include { SNPEFF			                                  }     from '../bin/snpeff/m
 
 workflow reference {
     preprocess_output = workflow_pre_process()
-    postprocess_output = workflow_post_process(preprocess_output.reference_ch, preprocess_output.fq_gz_reads_ch)
+    postprocess_output = workflow_post_process(preprocess_output.reference_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.personal_index_ch)
 }
 
 workflow workflow_pre_process {
@@ -59,12 +56,13 @@ workflow workflow_pre_process {
         return tuple (sample_id, ref_file)
     }
 
-    personal_index_bwa_ch = BUILD_INDEX_1(reference_ch)
     personal_index_ch = PERSONAL_GENOME_INDEX(reference_ch)
 
     emit:
     reference_ch
     fq_gz_reads_ch
+    personal_index_ch
+
 }
 
 workflow workflow_post_process {
@@ -72,12 +70,12 @@ workflow workflow_post_process {
     take:
     reference_ch
     fq_gz_reads_ch
-    
+    personal_index_ch
     main:
 
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
-    specie_mapping_ch = PERSONAL_GENOME_MAPPING(fq_gz_reads_ch, params.index_genome_personal)
-
+    mapping_input_ch = fq_gz_reads_ch.combine(personal_index_ch)
+    specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
 
     //Add groups and add or replace group
     bam_ch = specie_mapping_ch.map {
@@ -94,29 +92,28 @@ workflow workflow_post_process {
     
     //HAPLOTYPECALLER realignment consistently
 
-    haplotype_ch = gatk_add_ch.map { sample_id, bam, _ -> tuple(sample_id, bam) }
-    .combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) })
+    haplotype_ch = gatk_add_ch.dedup_bam.combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) })
     .set { all_samples_ch }
 
     gatk_haplotype_ch= HAPLOTYPECALLER(all_samples_ch) 
     
     //GenotypeCaller
-    gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch.out_files , gatk_haplotype_ch.reference_personal_genome)
-
+    gatk_genotype_ch = GENOTYPE_ANALYSIS (gatk_haplotype_ch.out_files.combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) }))
+    
     //Align
     //This tool takes a VCF file, left-aligns the indels and trims common bases from indels, leaving them with a minimum representation.
     //The same indel can often be placed at multiple positions and still represent the same haplotype.
     //We are going to take the optionally splits multiallelic sites into biallelics and left-aligns individual alleles.
-    aligns_and_normalized_ch = NORMALISE_DATA (gatk_genotype_ch, gatk_haplotype_ch.reference_personal_genome)
-
+    aligns_and_normalized_ch = NORMALISE_DATA (gatk_genotype_ch.combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) }))
+    
     //VatiantFilter
     //Filter the VCF using the parametres to get a hight quality and cover in SNPs and INDELS "QUAL || MQ || DP ".
     //all the parametres could be changen it, depends of the data.
-    variant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch, gatk_haplotype_ch.reference_personal_genome)
+    variant_filter_ch = FILTER_VARIANTS_PARAM (aligns_and_normalized_ch.combine(reference_ch.map {id_reference, reference -> tuple(id_reference, reference) }))
    
     // Decompress VCF
     vcf_ch = DECOMPRESS_VCF(variant_filter_ch.compl_vcf)
- 
+
     // BAKTA PROCESS BUILD A GFF AND CDS OF REFERENCE
     // PARAMS GFF PROVIDE OR NOT FORM THE CUSTOMER
     // Select GFF source (BAKTA or custom)
@@ -125,11 +122,12 @@ workflow workflow_post_process {
         gff3_ch = Channel.value(file(params.custom_gff3))
     } else {
         log.info "No custom GFF3 file provided — running BAKTA to generate it from the reference"
-        gff3_ch = BAKTA(reference_ch)
+        gff_first_ch = BAKTA(reference_ch)
+        gff3_ch = gff_first_ch.bakta_gff3
     }
-
+    
     // Combine channels for SNPEFF
-    vcf_gff_combined_ch = vcf_ch.combine(gff3_ch.bakta_gff3)
+    vcf_gff_combined_ch = vcf_ch.combine(gff3_ch)
     vcf_gff_ref_combined_ch = vcf_gff_combined_ch.combine(reference_ch)
 
     snpeff_input_ch = vcf_gff_ref_combined_ch.map { entry ->
@@ -145,6 +143,7 @@ workflow workflow_post_process {
     }
 
     snpeff_ch = SNPEFF(snpeff_input_ch)
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
