@@ -177,7 +177,7 @@ workflow workflow_amr {
     main:
     //AMR
     //AMR1-ABRIcate
-    abricate_ch = POST_ANALYSIS_ABRICATE(contigs_ch)
+    abricate_ch = POST_ANALYSIS_ABRICATE(contigs_ch, params.organism)
 
     //AMR2-RESFINDER
     resfinder_ch = POST_ANALYSIS_AMRFINDER(contigs_ch)
