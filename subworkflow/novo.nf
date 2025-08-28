@@ -1,6 +1,3 @@
-/*
-DSL2 channels
-*/
 nextflow.enable.dsl=2
 
 checkInputParams()

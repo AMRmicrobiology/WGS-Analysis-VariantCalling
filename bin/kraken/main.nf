@@ -15,8 +15,7 @@ process KRAKEN {
     """
     kraken2 --db /kraken_db/minikraken2_v1_8GB --paired ${reads[0]} ${reads[1]} --output ${sample_id}.kraken --threads 8 --gzip-compressed --report ${sample_id}.report.txt
 
-    awk '\$3 != "9606" && \$3 !~ /^94[0-9]{2}/ {print \$2}' ${sample_id}.kraken | sed 's/^/@/' > ${sample_id}.kraken.noise.clean.id
-
+    awk '\$3 != "9606" && \$3 !~ /^94[0-9]{2}/ {print \$2}' ${sample_id}.kraken > ${sample_id}.kraken.noise.clean.id
     """
 }
 

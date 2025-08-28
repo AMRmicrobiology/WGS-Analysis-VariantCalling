@@ -23,3 +23,4 @@ AMRmicrobiology/WGS-Analysis-VariantCalling/PipelineCP_V2.0.png
 work/
 .nextflow/
 data/out*
+.nfs*
