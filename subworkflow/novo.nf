@@ -21,7 +21,9 @@ Configuration environemnt:
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
-include { MULTIQC                                             }     from '../bin/qc/multiqc/main' 
+include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
+include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
+include { KRAKEN2_CLASSIFY                                    }     from '../bin/kraken/classify'
 include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
@@ -48,9 +50,9 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 
 
 workflow novo {
-    preprocess_output = workflow_pre_process()
+    krakenprocess_output = workflow_kraken_process()
+    preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
     anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch)
-    
     mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.wildtype_only_ch,
     preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
     anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
@@ -59,8 +61,19 @@ workflow novo {
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
 }
 
-workflow workflow_pre_process {
+workflow workflow_kraken_process {
+    //DB KRAKEN2
+    db_ready_ch = PREPARE_KRAKEN_DB()
+    DB_CH= db_ready_ch.db_ready
 
+    emit:
+    DB_CH
+}
+
+workflow workflow_pre_process {
+    take:
+    DB_CH
+    
     main:
     // Quality control and index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
@@ -70,10 +83,17 @@ workflow workflow_pre_process {
     // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
-
+    
     //KRAKEN
-    kraken_ch = KRAKEN(fq_gz_reads_ch)
+    READS_DB_CH = fq_gz_reads_ch.combine(DB_CH)
+                .map { sample_id, reads_pair, db_dir ->
+                def (r1, r2) = reads_pair
+                tuple (sample_id, [r1, r2], db_dir)
+    }
 
+    READS_DB_CH.view()
+    
+    kraken_ch = KRAKEN (READS_DB_CH)
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
 
