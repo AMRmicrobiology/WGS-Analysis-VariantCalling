@@ -56,7 +56,7 @@ workflow novo {
     mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.wildtype_only_ch,
     preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
     anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
-    preprocess_output.personal_index_ch)
+    preprocess_output.personal_index_ch, preprocess_output.prune_reads_ch)
     /*
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
 }
@@ -90,10 +90,9 @@ workflow workflow_pre_process {
                 def (r1, r2) = reads_pair
                 tuple (sample_id, [r1, r2], db_dir)
     }
-
-    READS_DB_CH.view()
     
     kraken_ch = KRAKEN (READS_DB_CH)
+    
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
 
@@ -105,6 +104,7 @@ workflow workflow_pre_process {
     }
     
     prune_ch = SEQTK_PRUNE(fastq_prunning_ch)
+    prune_reads_ch = prune_ch.pruned_reads
    
     //de novo assemble
     assemble_denovo_ch = ASSEMBLE(prune_ch)
@@ -140,6 +140,7 @@ workflow workflow_pre_process {
 
     //Emit results
     emit:
+    prune_reads_ch
     accurance_fasta_ch
     fq_gz_reads_ch
     wildtype_only_ch
@@ -181,12 +182,13 @@ workflow workflow_mapping_process {
     agt_protein_input_ch
     agt_gff_input_ch
     personal_index_ch
+    prune_reads_ch
 
     main:
 
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
     
-    mapping_input_ch = fq_gz_reads_ch.combine(personal_index_ch)
+    mapping_input_ch = prune_reads_ch.combine(personal_index_ch)
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
 
     //Add groups and Mark duplicates
