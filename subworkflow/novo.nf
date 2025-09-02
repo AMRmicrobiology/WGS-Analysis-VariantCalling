@@ -52,7 +52,7 @@ workflow novo {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
     anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch)
-    mappingprocess_output = workflow_mapping_process(preprocess_output.fq_gz_reads_ch, preprocess_output.wildtype_only_ch,
+    mappingprocess_output = workflow_mapping_process( preprocess_output.wildtype_only_ch,
     preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
     anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
     preprocess_output.personal_index_ch, preprocess_output.prune_reads_ch)
