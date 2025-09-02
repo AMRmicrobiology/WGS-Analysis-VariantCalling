@@ -34,7 +34,7 @@ include { MLST                                                }     from '../bin
 workflow assemble {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
-    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch )
+    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.prune_ch )
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
         mrsaprocess_output = workflow_mrsa(preprocess_output.accurance_fasta_ch)
@@ -137,6 +137,7 @@ workflow workflow_pre_process {
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
     
     emit:
+    prune_ch
     accurance_fasta_ch
     fq_gz_reads_ch
     busco_ch
@@ -145,6 +146,7 @@ workflow workflow_pre_process {
 
 workflow workflow_amr {
     take:
+    prune_ch
     accurance_fasta_ch
     fq_gz_reads_ch
     
@@ -165,7 +167,7 @@ workflow workflow_amr {
         .map { scheme -> tuple(params.organism, scheme) }
         .unique()
 
-    def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
+    def combined_ch = prune_ch.combine(organism_schemes_ch)
 
     ariba_ch = ARIBA(combined_ch)
     
