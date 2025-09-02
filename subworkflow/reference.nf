@@ -9,6 +9,8 @@ reference         = file("${params.reference}")
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
+include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
+include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
 include { BAKTA                                               }     from '../bin/anotations/bakta/main'
 include { EXTRACT_CDS_FROM_BAKTA			                  }     from '../bin/anotations/bakta/main_2'
