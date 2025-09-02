@@ -31,7 +31,8 @@ include { MLST                                                }     from '../bin
 
 
 workflow assemble {
-    preprocess_output = workflow_pre_process()
+    krakenprocess_output = workflow_kraken_process()
+    preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
     amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch )
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
@@ -39,9 +40,20 @@ workflow assemble {
     }
 }
 
+
+workflow workflow_kraken_process {
+    db_ready_ch = PREPARE_KRAKEN_DB()
+    DB_CH= db_ready_ch.db_ready
+
+    emit:
+    DB_CH
+}
+
 workflow workflow_pre_process {
 
     take:
+    DB_CH
+
     main:
     // Quality control and index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
@@ -51,9 +63,15 @@ workflow workflow_pre_process {
     // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
-   
+
     //KRAKEN
-    kraken_ch = KRAKEN(fq_gz_reads_ch)
+    READS_DB_CH = fq_gz_reads_ch.combine(DB_CH)
+                .map { sample_id, reads_pair, db_dir ->
+                def (r1, r2) = reads_pair
+                tuple (sample_id, [r1, r2], db_dir)
+    }
+
+    kraken_ch = KRAKEN (READS_DB_CH)
 
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
