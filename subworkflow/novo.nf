@@ -174,7 +174,6 @@ workflow workflow_anotation_process {
 workflow workflow_mapping_process {
 
     take:
-    fq_gz_reads_ch
     wildtype_only_ch
     accurance_fasta_ch
     agt_cds_input_ch

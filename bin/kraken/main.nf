@@ -7,7 +7,7 @@ process KRAKEN {
     time '24h'
 
     input:
-    tuple val(sample_id), path(reads), path db_dir
+    tuple val(sample_id), path(reads), path (db_dir)
 
     output:
     tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken_dir
