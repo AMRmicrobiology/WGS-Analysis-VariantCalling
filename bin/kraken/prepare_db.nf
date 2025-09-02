@@ -4,8 +4,6 @@ process PREPARE_KRAKEN_DB {
   memory '4 GB'
   time '24h'
 
-  publishDir "${params.kraken_dir}", mode: 'copy'
-
   output:
   path 'kraken_db', emit: db_ready
 
