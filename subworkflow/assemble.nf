@@ -13,6 +13,7 @@ include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
+include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
 include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
