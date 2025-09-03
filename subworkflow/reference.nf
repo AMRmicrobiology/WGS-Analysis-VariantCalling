@@ -29,8 +29,10 @@ include { SNPEFF			                                  }     from '../bin/snpeff/m
 workflow reference {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
-    postprocess_output = workflow_post_process(preprocess_output.reference_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.personal_index_ch,
+    
+    postprocess_output = workflow_post_process(preprocess_output.fq_gz_reads_ch,
         preprocess_output.prune_reads_ch)
+    
 }
 
 workflow workflow_kraken_process {
@@ -80,6 +82,22 @@ workflow workflow_pre_process {
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
 
+
+
+    emit:
+    fq_gz_reads_ch
+    prune_reads_ch
+
+}
+
+workflow workflow_post_process {
+
+    take:
+    prune_reads_ch
+    fq_gz_reads_ch
+
+    main:
+
     //Reference Genome INDEX
     personal_ref_ch = Channel.fromPath(params.personal_ref)
     reference_ch = personal_ref_ch.map {
@@ -90,26 +108,10 @@ workflow workflow_pre_process {
     }
 
     personal_index_ch = PERSONAL_GENOME_INDEX(reference_ch)
-
-    emit:
-    reference_ch
-    fq_gz_reads_ch
-    personal_index_ch
-    prune_reads_ch
-
-}
-
-workflow workflow_post_process {
-
-    take:
-    prune_reads_ch
-    reference_ch
-    fq_gz_reads_ch
-    personal_index_ch
-    main:
-
+    
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
     mapping_input_ch = prune_reads_ch.combine(personal_index_ch)
+
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
 
     //Add groups and add or replace group
@@ -178,7 +180,7 @@ workflow workflow_post_process {
     }
 
     snpeff_ch = SNPEFF(snpeff_input_ch)
-    
+      
 }
 
 ////////////////////////////////////////////////////////////////////////////////
