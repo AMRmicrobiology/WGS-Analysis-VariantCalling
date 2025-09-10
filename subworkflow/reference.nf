@@ -30,8 +30,7 @@ workflow reference {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
     
-    postprocess_output = workflow_post_process(preprocess_output.fq_gz_reads_ch,
-        preprocess_output.prune_reads_ch)
+    postprocess_output = workflow_post_process(preprocess_output.prune_reads_ch)
     
 }
 
@@ -85,7 +84,6 @@ workflow workflow_pre_process {
 
 
     emit:
-    fq_gz_reads_ch
     prune_reads_ch
 
 }
@@ -94,7 +92,6 @@ workflow workflow_post_process {
 
     take:
     prune_reads_ch
-    fq_gz_reads_ch
 
     main:
 
