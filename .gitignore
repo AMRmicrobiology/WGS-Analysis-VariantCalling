@@ -25,3 +25,4 @@ work/
 data/out*
 .nfs*
 kraken_db/*
+DVT_trace.txt
