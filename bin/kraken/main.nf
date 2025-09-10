@@ -1,37 +1,52 @@
 process KRAKEN {
-    tag "$sample_id"
-    container "$params.kraken.docker"
+  tag "$sample_id"
+  container "$params.kraken.docker"
 
-    cpus   { params.kraken_cpus }
-    memory { params.kraken_mem  }
-    time '24h'
+  cpus   { params.kraken_cpus }
+  memory { params.kraken_mem  }
+  time '24h'
 
-    input:
-    tuple val(sample_id), path(reads), path (db_dir)
+  input:
+  tuple val(sample_id), path(reads), path (db_dir)
 
-    output:
-    tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken_dir
-    tuple val(sample_id), path("${sample_id}.kraken.noise.clean.id"), emit: keep_ids
-    path("${sample_id}.report.txt"), emit: report
+  output:
+  tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken_dir
+  tuple val(sample_id), path("${sample_id}.kraken.noise.clean.id"), emit: keep_ids
+  path("${sample_id}.report.txt"), emit: report
 
-    script:
-    
+  script:
     """
-    kraken2 \
-    --db "${db_dir}" \
-    --paired "${reads[0]}" "${reads[1]}" \
-    --threads ${task.cpus} \
-    --gzip-compressed \
-    --memory-mapping \
-    ${ params.kraken2_extra_args ?: '' } \
-    ${ params.kraken_confidence ? "--confidence ${params.kraken_confidence}" : "" } \
-    --use-names \
-    --report "${sample_id}.report.txt" \
-    > "${sample_id}.kraken"
+    kraken2 \\
+      --db "${db_dir}" \\
+      --paired "${reads[0]}" "${reads[1]}" \\
+      --threads ${task.cpus} \\
+      --gzip-compressed \\
+      --memory-mapping \\
+      ${ params.kraken2_extra_args ?: '' } \\
+      ${ params.kraken_confidence ? "--confidence ${params.kraken_confidence}" : "" } \\
+      --report "${sample_id}.report.txt" \\
+      > "${sample_id}.kraken"
 
-    awk '\$3 != "9606" && \$3 !~ /^94[0-9]{2}/ {print \$2}' ${sample_id}.kraken > ${sample_id}.kraken.noise.clean.id
+    # keep_ids excluyendo Primates y ancestros (taxid ID)
+    
+    cat > ids.awk << 'AWK'
+    BEGIN{
+      split("9443 9606 9605 9604 9598 9593 9601 9526 9483 314295 40674", a, " ");
+      for(i in a) deny[a[i]]=1;
+    }
+    {
+      status=\$1; rid=\$2; tax=\$3;
+      # U = Unclassified -> conservar
+      if (status=="U") { print rid; next }
+      # C = Classified -> conservar solo si NO está en la denylist
+      if (!(tax in deny)) { print rid }
+    }
+    AWK
+
+    awk -f ids.awk ${sample_id}.kraken > ${sample_id}.kraken.noise.clean.id
     """
 }
+
 
 process SEQTK_PRUNE {
   tag "$sample_id"

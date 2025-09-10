@@ -16,7 +16,7 @@ process FILTER_CONTIGS {
   pre_bases=\$(grep -v '^>' ${contigs} | tr -d '\\n' | wc -c)
   
   # Filtrar contigs <200 nt
-  seqtk seq -A -L 200 ${contigs} > ${sample_id}.contigs.filtered.fasta
+  seqtk seq -A -L 300 ${contigs} > ${sample_id}.contigs.filtered.fasta
   
   # Contar después
   post_counts=\$(grep -c '^>' ${sample_id}.contigs.filtered.fasta)

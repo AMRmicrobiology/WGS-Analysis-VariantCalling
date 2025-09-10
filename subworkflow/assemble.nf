@@ -34,7 +34,9 @@ include { MLST                                                }     from '../bin
 workflow assemble {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
+    /*
     amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.prune_ch )
+    */
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
         mrsaprocess_output = workflow_mrsa(preprocess_output.accurance_fasta_ch)
@@ -186,7 +188,7 @@ workflow workflow_post_process {
     multiqc_2_ch = POST_MULTIQC(quast_ch.map{ it -> it[1] }.collect(), busco_ch.map{ it -> it[1] }.collect())
 
 }
-
+/*
 workflow workflow_mrsa {
     take:
     accurance_fasta_ch
@@ -199,6 +201,7 @@ workflow workflow_mrsa {
     sccmec_ch = SCCMEC(accurance_fasta_ch)
 
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////
