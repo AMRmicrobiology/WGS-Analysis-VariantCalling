@@ -52,8 +52,10 @@ process GENOTYPE {
         -R ${reference} \
         -V ${vcf} \
         -O final_${sample_id}.vcf.gz \
+        --sample-ploidy 1 \
         --max-alternate-alleles 6 \
-        --allow-old-rms-mapping-quality-annotation-data false
+        --allow-old-rms-mapping-quality-annotation-data false \
+        --annotate-with-num-discovered-alleles true
 
     # Index the output VCF file
     tabix -f -p vcf final_${sample_id}.vcf.gz
