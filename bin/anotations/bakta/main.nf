@@ -32,12 +32,12 @@ process BAKTA {
     path "annotations_${sample_id}/${sample_id}.json", emit: bakta_json
     tuple val(sample_id), path("annotations_${sample_id}/${sample_id}.gff3"), path("annotations_${sample_id}/${sample_id}.fna"), emit: conv_gff
 
+    
     script:
 
     """
     amrfinder_update --force_update --database /data/db-light/amrfinderplus-db
 
     bakta --db /data/db-light --threads ${task.cpus} --keep-contig-headers --output annotations_${sample_id} ${assembly_file}
-
     """
 }

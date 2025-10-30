@@ -9,6 +9,8 @@ reference         = file("${params.reference}")
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
+include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
+include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
 include { BAKTA                                               }     from '../bin/anotations/bakta/main'
 include { EXTRACT_CDS_FROM_BAKTA			                  }     from '../bin/anotations/bakta/main_2'
@@ -25,12 +27,25 @@ include { DECOMPRESS_VCF                                      }     from '../bin
 include { SNPEFF			                                  }     from '../bin/snpeff/main_3'
 
 workflow reference {
-    preprocess_output = workflow_pre_process()
-    postprocess_output = workflow_post_process(preprocess_output.reference_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.personal_index_ch)
+    krakenprocess_output = workflow_kraken_process()
+    preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
+    
+    postprocess_output = workflow_post_process(preprocess_output.prune_reads_ch)
+    
+}
+
+workflow workflow_kraken_process {
+    db_ready_ch = PREPARE_KRAKEN_DB()
+    DB_CH= db_ready_ch.db_ready
+
+    emit:
+    DB_CH
 }
 
 workflow workflow_pre_process {
     take:
+    DB_CH
+
     main:
     // Quality control and Index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
@@ -41,11 +56,44 @@ workflow workflow_pre_process {
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
 
+    //KRAKEN
+    READS_DB_CH = fq_gz_reads_ch.combine(DB_CH)
+                .map { sample_id, reads_pair, db_dir ->
+                def (r1, r2) = reads_pair
+                tuple (sample_id, [r1, r2], db_dir)
+    }
+
+    kraken_ch = KRAKEN (READS_DB_CH)
+
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
     
+    //PRUNNING
+    fastq_prunning_ch = fq_gz_reads_ch.join(kraken_ch.keep_ids).map {
+        sample_id,reads_pair, keep_ids ->
+        def (r1, r2) = reads_pair
+        tuple (sample_id, [r1, r2], keep_ids)
+    }
+    
+    prune_ch = SEQTK_PRUNE(fastq_prunning_ch)
+    prune_reads_ch = prune_ch.pruned_reads
+
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
+
+
+
+    emit:
+    prune_reads_ch
+
+}
+
+workflow workflow_post_process {
+
+    take:
+    prune_reads_ch
+
+    main:
 
     //Reference Genome INDEX
     personal_ref_ch = Channel.fromPath(params.personal_ref)
@@ -57,24 +105,10 @@ workflow workflow_pre_process {
     }
 
     personal_index_ch = PERSONAL_GENOME_INDEX(reference_ch)
-
-    emit:
-    reference_ch
-    fq_gz_reads_ch
-    personal_index_ch
-
-}
-
-workflow workflow_post_process {
-
-    take:
-    reference_ch
-    fq_gz_reads_ch
-    personal_index_ch
-    main:
-
+    
     //mapping process- Mapping used Specie ref. genome, include samtools sorted
-    mapping_input_ch = fq_gz_reads_ch.combine(personal_index_ch)
+    mapping_input_ch = prune_reads_ch.combine(personal_index_ch)
+
     specie_mapping_ch = PERSONAL_GENOME_MAPPING(mapping_input_ch)
 
     //Add groups and add or replace group
@@ -143,7 +177,7 @@ workflow workflow_post_process {
     }
 
     snpeff_ch = SNPEFF(snpeff_input_ch)
-    
+      
 }
 
 ////////////////////////////////////////////////////////////////////////////////

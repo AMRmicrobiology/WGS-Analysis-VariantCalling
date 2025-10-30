@@ -7,18 +7,15 @@ process SNPEFF {
     container "$params.snpeff.docker"
 
     input:
-    path gff3_file
-    tuple val(id_reference), path(assembly_file)
+    tuple val(new_id), path(variants_vcf), val(id_reference), path(assembly_file), path(gff3_file) ,path(protein_fasta), path(cds_fasta)
     val genome_name_db
-    path protein_fasta
-    path cds_fasta
-    tuple val(new_id), path(variants_vcf)
-
+    
     output:
     path "annotated_${new_id}_variants.vcf", emit: annotated_vcf
 
     script:
     """
+    
     mkdir -p /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/data/${genome_name_db}
 
     cp ${assembly_file} /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/data/${genome_name_db}/sequences.fa
@@ -32,5 +29,6 @@ process SNPEFF {
     snpEff build -gff3 -v ${genome_name_db}
 
     snpEff ann -noLog -noStats -no-upstream -no-downstream -no-utr -c /opt/conda/envs/snpeff_env/share/snpeff-5.2-1/snpEff.config -o vcf ${genome_name_db} ${variants_vcf} > annotated_${new_id}_variants.vcf
+    
     """
 }

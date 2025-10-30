@@ -4,8 +4,7 @@ process ALIGN {
     container "$params.gatk4.docker"
 
     input:
-    tuple val (sample_id), path(vcf)
-    tuple val(id_reference), path(reference)
+    tuple val (sample_id), path(vcf), val(id_reference), path(reference)
 
     output:
     tuple val (sample_id), path("${sample_id}_aligned.vcf.gz")

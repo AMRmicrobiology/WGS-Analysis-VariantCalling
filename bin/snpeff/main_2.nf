@@ -5,6 +5,7 @@ process DECOMPRESS_VCF {
 
     output:
     tuple val(sample_id), path("${filtered_vcf.baseName}")
+    
     script:
     """
     gunzip -c ${filtered_vcf} > ${filtered_vcf.baseName}

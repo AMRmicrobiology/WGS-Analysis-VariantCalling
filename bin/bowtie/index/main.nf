@@ -1,5 +1,5 @@
 process BUILD_INDEX {
-    tag "Index-ReferenceGenome ${reference_id.name}"
+    tag "Index reference genome: ${reference_id.simpleName}"
 
     publishDir "${params.reference}/personal/index", mode: 'copy'
 
@@ -7,14 +7,10 @@ process BUILD_INDEX {
     tuple val(sample_id), path(reference_id)
 
     output:
-    path("index_personal_genome.*.bt2"), emit: index_files
-
+    tuple val(sample_id), path("index_${sample_id}.*.bt2"), path(reference_id), emit: index_out
 
     script:
-    def index_prefix = "index_personal_genome"
-
-    // Bowtie2    
     """
-    bowtie2-build ${reference_id} ${index_prefix}
+    bowtie2-build ${reference_id} index_${sample_id}
     """
 }

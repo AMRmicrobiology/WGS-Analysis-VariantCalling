@@ -3,7 +3,7 @@ process ASSEMBLE {
 
     input:
 
-    tuple val (sample_id), path(pair_id_1), path(pair_id_2)
+    tuple val (sample_id), path(pair_id)
 
     output:
 
@@ -17,7 +17,7 @@ process ASSEMBLE {
     script:
 
     """
-    spades.py -1 ${pair_id_1} -2 ${pair_id_2} --isolate -k auto -o ${sample_id}_spades_out && \
+    spades.py -1 ${pair_id[0]} -2 ${pair_id[1]} --isolate -k auto -o ${sample_id}_spades_out && \
     mv ${sample_id}_spades_out/contigs.fasta ${sample_id}.fasta && \
     mv ${sample_id}_spades_out/scaffolds.fasta scaffolds_${sample_id}.fasta
     """

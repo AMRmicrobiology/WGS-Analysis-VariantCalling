@@ -9,8 +9,7 @@ process GENOTYPE {
     container "$params.gatk4.docker"  
 
     input:
-    tuple val(sample_id), path(vcf)
-    tuple val(id_reference), path(reference)
+    tuple val(sample_id), path(vcf), val(id_reference), path(reference)
 
     output:
     tuple val(sample_id), path("final_${sample_id}.vcf.gz")
@@ -53,8 +52,10 @@ process GENOTYPE {
         -R ${reference} \
         -V ${vcf} \
         -O final_${sample_id}.vcf.gz \
+        --sample-ploidy 1 \
         --max-alternate-alleles 6 \
-        --allow-old-rms-mapping-quality-annotation-data false
+        --allow-old-rms-mapping-quality-annotation-data false \
+        --annotate-with-num-discovered-alleles true
 
     # Index the output VCF file
     tabix -f -p vcf final_${sample_id}.vcf.gz

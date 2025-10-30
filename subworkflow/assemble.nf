@@ -13,6 +13,7 @@ include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
+include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
 include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { ASSEMBLE                                            }     from '../bin/assemble/main'
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
@@ -31,17 +32,31 @@ include { MLST                                                }     from '../bin
 
 
 workflow assemble {
-    preprocess_output = workflow_pre_process()
-    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch )
+    krakenprocess_output = workflow_kraken_process()
+    preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
+    /*
+    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.prune_ch )
+    */
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
         mrsaprocess_output = workflow_mrsa(preprocess_output.accurance_fasta_ch)
     }
 }
 
+
+workflow workflow_kraken_process {
+    db_ready_ch = PREPARE_KRAKEN_DB()
+    DB_CH= db_ready_ch.db_ready
+
+    emit:
+    DB_CH
+}
+
 workflow workflow_pre_process {
 
     take:
+    DB_CH
+
     main:
     // Quality control and index build
     read_ch = Channel.fromFilePairs(params.input, size: 2)
@@ -51,9 +66,15 @@ workflow workflow_pre_process {
     // Trimming process
     trimmed_read_ch = TRIMMING(read_ch)
     fq_gz_reads_ch = trimmed_read_ch.trimmed_reads
-   
+
     //KRAKEN
-    kraken_ch = KRAKEN(fq_gz_reads_ch)
+    READS_DB_CH = fq_gz_reads_ch.combine(DB_CH)
+                .map { sample_id, reads_pair, db_dir ->
+                def (r1, r2) = reads_pair
+                tuple (sample_id, [r1, r2], db_dir)
+    }
+
+    kraken_ch = KRAKEN (READS_DB_CH)
 
     //Final Quality control after trimming
     fastq_ch_after = FASTQC_QUALITY_FINAL(trimmed_read_ch.trimmed_reads.map{it -> it[1]})
@@ -118,6 +139,7 @@ workflow workflow_pre_process {
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
     
     emit:
+    prune_ch
     accurance_fasta_ch
     fq_gz_reads_ch
     busco_ch
@@ -126,6 +148,7 @@ workflow workflow_pre_process {
 
 workflow workflow_amr {
     take:
+    prune_ch
     accurance_fasta_ch
     fq_gz_reads_ch
     
@@ -146,7 +169,7 @@ workflow workflow_amr {
         .map { scheme -> tuple(params.organism, scheme) }
         .unique()
 
-    def combined_ch = fq_gz_reads_ch.combine(organism_schemes_ch)
+    def combined_ch = prune_ch.combine(organism_schemes_ch)
 
     ariba_ch = ARIBA(combined_ch)
     
@@ -165,7 +188,7 @@ workflow workflow_post_process {
     multiqc_2_ch = POST_MULTIQC(quast_ch.map{ it -> it[1] }.collect(), busco_ch.map{ it -> it[1] }.collect())
 
 }
-
+/*
 workflow workflow_mrsa {
     take:
     accurance_fasta_ch
@@ -178,6 +201,7 @@ workflow workflow_mrsa {
     sccmec_ch = SCCMEC(accurance_fasta_ch)
 
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////

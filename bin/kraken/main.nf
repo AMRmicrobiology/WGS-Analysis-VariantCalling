@@ -1,23 +1,52 @@
 process KRAKEN {
-    tag "$sample_id"
-    container "$params.kraken.docker"
+  tag "$sample_id"
+  container "$params.kraken.docker"
 
-    input:
-    tuple val(sample_id), path(reads)
+  cpus   { params.kraken_cpus }
+  memory { params.kraken_mem  }
+  time '24h'
 
-    output:
-    tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken_dir
-    tuple val(sample_id), path("${sample_id}.kraken.noise.clean.id"), emit: keep_ids
-    path("${sample_id}.report.txt"), emit: report
+  input:
+  tuple val(sample_id), path(reads), path (db_dir)
 
-    
-    script:
+  output:
+  tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken_dir
+  tuple val(sample_id), path("${sample_id}.kraken.noise.clean.id"), emit: keep_ids
+  path("${sample_id}.report.txt"), emit: report
+
+  script:
     """
-    kraken2 --db /kraken_db/minikraken2_v1_8GB --paired ${reads[0]} ${reads[1]} --output ${sample_id}.kraken --threads 8 --gzip-compressed --report ${sample_id}.report.txt
-    awk '\$3 != \"9606\" {print \$2}' ${sample_id}.kraken > ${sample_id}.kraken.noise.clean.id
+    kraken2 \\
+      --db "${db_dir}" \\
+      --paired "${reads[0]}" "${reads[1]}" \\
+      --threads ${task.cpus} \\
+      --gzip-compressed \\
+      --memory-mapping \\
+      ${ params.kraken2_extra_args ?: '' } \\
+      ${ params.kraken_confidence ? "--confidence ${params.kraken_confidence}" : "" } \\
+      --report "${sample_id}.report.txt" \\
+      > "${sample_id}.kraken"
+
+    # keep_ids excluyendo Primates y ancestros (taxid ID)
     
+    cat > ids.awk << 'AWK'
+    BEGIN{
+      split("9443 9606 9605 9604 9598 9593 9601 9526 9483 314295 40674", a, " ");
+      for(i in a) deny[a[i]]=1;
+    }
+    {
+      status=\$1; rid=\$2; tax=\$3;
+      # U = Unclassified -> conservar
+      if (status=="U") { print rid; next }
+      # C = Classified -> conservar solo si NO está en la denylist
+      if (!(tax in deny)) { print rid }
+    }
+    AWK
+
+    awk -f ids.awk ${sample_id}.kraken > ${sample_id}.kraken.noise.clean.id
     """
 }
+
 
 process SEQTK_PRUNE {
   tag "$sample_id"
@@ -26,7 +55,7 @@ process SEQTK_PRUNE {
     tuple val(sample_id), path(reads), path(keep_ids)
     
   output:
-    tuple val(sample_id), path("${sample_id}.R1.clean.fastq.gz"), path("${sample_id}.R2.clean.fastq.gz")
+    tuple val(sample_id), path("${sample_id}.R{1,2}.clean.fastq.gz"), emit: pruned_reads
 
   script:
   """
