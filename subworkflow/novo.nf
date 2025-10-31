@@ -161,7 +161,7 @@ workflow workflow_anotation_process {
     //merge anotations
     agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, wildtype_only_ch)
 
-    agt_gff_input_ch = agt_ch.combine_gff3
+    agt_gff_input_ch = agt_ch.final_gff3
     agt_protein_input_ch = agt_ch.protein_fasta
     agt_cds_input_ch = agt_ch.cds_fasta
 
