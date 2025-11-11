@@ -20,11 +20,17 @@ process FILTER_VARIANTS {
     def referenceDict = referenceBase + ".dict"
     def referenceFai = reference + ".fai"
 
-    // Defaults parametres of filtering
-    def snpExpr   = params.snp_filter_expr   ?: 'QUAL < 100.0 || MQ < 40.0 || DP < 50 || QD < 2.0 || FS > 60.0 || SOR > 3.0'
+    // Defaults parámetros de filtrado (parte "simple")
+    def snpBase   = params.snp_filter_expr   ?: 'QUAL < 100.0 || MQ < 40.0 || DP < 50 || QD < 2.0 || FS > 60.0 || SOR > 3.0'
     def indelExpr = params.indel_filter_expr ?: 'QUAL < 200.0 || MQ < 40.0 || DP < 30 || QD < 2.0 || FS > 200.0 || SOR > 10.0 || HRun > 6'
 
-    // escape 
+    // BALANSE OF ALLELO
+    def snpAlleleBalance = 'vc.getGenotype(0).getAD() == null || (vc.getGenotype(0).getAD().1 + 1.0) / (vc.getGenotype(0).getAD().0 + vc.getGenotype(0).getAD().1 + 1.0) < 0.95'
+
+    // COMBINE: (umbrales) || (balance)
+    def snpExpr = "(${snpBase}) || (${snpAlleleBalance})"
+
+    // escape
     snpExpr   = snpExpr.replaceAll('"', '\\"')
     indelExpr = indelExpr.replaceAll('"', '\\"')
 
@@ -63,7 +69,7 @@ process FILTER_VARIANTS {
         -R ${reference} \\
         -V ${vcf} \\
         --filter-name "LowQualSNP" \\
-        --filter-expression "${snpExpr}" || (vc.getGenotype(0).getAD() == null || (vc.getGenotype(0).getAD().1 + 1.0) / (vc.getGenotype(0).getAD().0 + vc.getGenotype(0).getAD().1 + 1.0) < 0.95)" \\
+        --filter-expression "${snpExpr}" \\
         -O ${sample_id}_snps_filtered.vcf.gz
 
     # Filtering Indels with Homopolymer Regions
