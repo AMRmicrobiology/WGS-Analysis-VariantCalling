@@ -18,6 +18,7 @@ Configuration environemnt:
 
 //Call all the sub-work
 
+include { BAKTA_SET_DB                                        }     from '../bin/annotation/bakta/db_set'
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'
@@ -64,9 +65,13 @@ workflow workflow_kraken_process {
     //DB KRAKEN2
     db_ready_ch = PREPARE_KRAKEN_DB()
     DB_CH= db_ready_ch.db_ready
+    //DB BAKTA
+    db_bakta_ready_ch = BAKTA_SET_DB()
+    DB_BAKTA_CH = db_bakta_ready_ch.db_bakta_dir
 
     emit:
     DB_CH
+    DB_BAKTA_CH
 }
 
 workflow workflow_pre_process {

@@ -1,5 +1,11 @@
 process PREPARE_KRAKEN_DB {
   tag "${params.db_select ?: 'db_16GB'}"
+  label 'kraken_db_setup'
+
+  container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+      "docker://${params.kraken2_new.docker}" :
+      params.kraken2_new.docker }"
+
   cpus 2
   memory '4 GB'
   time '24h'
