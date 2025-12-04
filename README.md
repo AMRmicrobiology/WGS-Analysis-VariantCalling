@@ -17,7 +17,7 @@ This repository contains Nextflow-based pipeline for whole-genome sequencing (WG
 - [Pipeline summary](#pipeline-summary)
     - [Refence genome](#mode---reference-and---novo)
     - [*De-novo*](#mode---reference-and---novo)
-    - [Assemble](#mode---assemble)
+    - [Genome assembly](#mode---assemble)
 - [Installation](#installation)
 - [How to Use It](#how-to-use-it)
     - [Parameters](#parameters)
@@ -27,54 +27,55 @@ This repository contains Nextflow-based pipeline for whole-genome sequencing (WG
 
 ## Pipeline summary:
 
-All modes in the pipeline includes the following steps:
+All modes in the pipeline include the following steps:
 
-1. **Quality Control**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+1. **Reads Quality Control and trimming**: Quality of raw sequencing data is assessed using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). Low-quality bases and adapter sequences are removed with [FastP](https://github.com/OpenGene/fastp), followed by another round of [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). A summary of all QC reports is generated with [MultiQC](https://github.com/MultiQC/MultiQC).
 
-    *  At this stage, the pipeline offers two modes that differ based on the input reference genome. Variant calling can be performed using either a [*de novo*](#de-novo) assembled reference strain or an existing [reference genome](#reference-genome). In the *de novo*, preliminary steps are performed to assemble the desired reference genome:
+2. **Contaminant sequence removal**: The taxonomic sequence classifier [Kraken2](https://github.com/DerrickWood/kraken2) is used to identify contaminant non-bacterial reads followed by [SEQTK](https://github.com/lh3/seqtk) to filter out all reads flagged as contaminants.
 
-        *  **Assembly**: Following quality control, *de novo* assembly is performed using [SPAdes](https://github.com/ablab/spades).
-        * **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://bioinf.spbau.ru/quast), while genome completeness is assessed using [BUSCO](https://busco.ezlab.org/).
-        *   **Annotation**: Genome annotation is carried out with [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta).
+At this stage, the pipeline offers three modes, which differ based on the expected output **—Variant Calling** or **Genome Assembly—** and the type of input data:
+- For **Variant Calling**, the analysis can be performed using either
+    -  a [*de novo*](#mode---reference-and---novo) assembled reference strain (--mode novo) or,
+    - an existing [reference genome](#mode---reference-and---novo) (--mode reference). 
+- A shorter version of the pipeline is available to solely perform [genome assembly](#mode---assemble) (--mode assemble). 
+___
 
+In both **genome assembly** (--mode assemble) and ***de novo* Variant Calling** (--mode novo), raw reads are initially assembled into a genome following the following steps:
 
-#### mode --reference and --novo
-> ***Reference and De-novo***    
->After the reference genome is provided (*de novo* or an exisiting reference), the pipeline follows the same steps for both modes:
->
->    2. **Aggregation of quality reports**: A summary report is genereated with [MultiQC](https://github.com/MultiQC/MultiQC), incorporating the various FastQC reports and, depending on the mode, the QUAST genome quality report.
->    3. **Alignment**: Reads are aligned against the selected reference genome with [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), followed by processing with [Samtools](https://github.com/samtools/samtools).
->    4. **Variant calling and filtering**: Multiple steps are designed to identify, filter and annotate variants.
->        * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
->        *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
->        *  **Genetic variant annotation**: The toolbox [SnpEff](http://pcingola.github.io/SnpEff/) is used to annotate and predict the functional effects of genetic variants on genes and proteins.
->    7. **Post-assembly Analyses**: 
->        * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
->        *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+1. **Assembly**: Filtered reads are *de novo* assembled using [SPAdes](https://github.com/ablab/spades).
+2. **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://quast.sourceforge.net/), and genome completeness is assessed using [BUSCO](https://busco.ezlab.org/). A final combined report is generated with [MultiQC](https://github.com/MultiQC/MultiQC).
+3.   **Annotation**:  Genome annotation is performed using both [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta). The resulting GFF annotation files from both annotation tools are cleaned and combined using [AGAT](https://github.com/NBISweden/AGAT).
+4. **Mass screening of contigs for antimicrobial resistance and virulence genes** using [ABRIcate](https://github.com/tseemann/abricate) and **identification of antimicrobial resistance genes and point mutations** in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
+---
+After the assembly process, the Variant Calling analysis and the genome assembly mode diverge in their subsequent steps.
 
-#### mode --assemble
+### mode --reference & mode --novo
+ ***Reference and De-novo Variant Calling***    
+Once a reference genome is provided —either *de novo* assembled or an existing reference— the pipeline follows the same steps for both modes:
 
-> ***Assemble***    
->For the --mode assemble, a simplifies pipeline is performed:
->
->    2. **Post-assembly Analyses**: 
->        * Mass screening of contigs for antimicrobial resistance or virulence genes using [ABRIcate](https://github.com/tseemann/abricate).
->        *  Identification of antimicrobial resistance genes and point mutations in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
->       * MLST analysis: [ARIBA]() performs a fast MLST analysis, using the raw fastq data and [MLST]() a slow MLST analysis using the genome assembly. 
->       * *Staphylococcus aureus*: In case --mrsa is true, the [spaTyper]() and [sccmec]() software analysis are performed.
+1. **Alignment**: Reads are aligned to the selected reference genome using [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), and the resulting alignments are then processed with [Samtools](https://github.com/samtools/samtools).
+2. **Variant calling and filtering**: Several steps are performed to identify, filter and annotate genomic variants.
+     * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
+    *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
+    *  **Genetic variant annotation**: The toolbox [SnpEff](http://pcingola.github.io/SnpEff/) is used to annotate and predict the functional effects of genetic variants on genes and proteins.
 
- > [!NOTE] 
+### mode --assemble
+
+ ***Genome Assembly***    
+For the --mode assemble, a simplified pipeline is executed:
+ * MLST analysis: 
+    - A fast MLST analysis is performed using raw FASTQ reads with [ARIBA](https://github.com/sanger-pathogens/ariba) 
+    - A slow MLST analysis is performed on the assembled genome using [MLST](https://github.com/tseemann/mlst). 
+ * *Staphylococcus aureus*: In case --mrsa is added in the command line, the [spaTyper](https://github.com/HCGB-IGTP/spaTyper) and [sccmec](https://github.com/rpetit3/sccmec) tools are used to identifying the spa type and the SCCmec cassettes.
+
+ >[!NOTE] 
  The pipeline includes an script to download the reads from DB using an Acc_List.txt<br>
     ```
     bash ./workflow/bin/download_reads.sh
     ```
-   
-
-
-
 ## Installation
 Prerequisites to run the pipeline:
-- Install [Nextflow](https://github.com/nextflow-io/nextflow).
+- Install [Nextflow](https://github.com/nextflow-io/nextflow) (Ver. ≥ 25.10.0).
 - Install [Docker](https://github.com/docker/docker-install) or [Singularity](https://github.com/sylabs/singularity-admindocs/blob/main/installation.rst) for container support.
 - Ensure [Java 8](https://github.com/winterbe/java8-tutorial) or a later version is installed.
 
@@ -87,78 +88,88 @@ git clone https://github.com/AMRmicrobiology/WGS-Analysis-VariantCalling.git
 # Move inside the main directory
 cd WGS-Analysis-VariantCalling
 ```
-<!-- compl -->
-### Local (conda)
-To create a local conda environment type the following commands:
-  ```
-  conda create -n WGS -f enviromentWGS.yaml
-  conda activate WGS
-  ```
+### Local (Singularity)
+If you are running the pipeline locally, remember to define the path for Singularity temporary files and cache:
+ ```
+SINGULARITY_TMPDIR=/PATH/singularity/tmp
+SINGULARITY_CACHEDIR=/PATH/singularity/cache
+TMPDIR=/PATH/singularity/tmp
+export NFX_SINGULARITY_CACHEDIR =/PATH/singularity/tmp
+```
+e.g:
+```
+SINGULARITY_TMPDIR=/mnt/dades/singularity/tmp
+SINGULARITY_CACHEDIR=/mnt/dades/singularity/tmp
+TMPDIR=/mnt/dades/singularity/tmp
+export NFX_SINGULARITY_CACHEDIR=/mnt/dades/singularity/tmp
+```
+>[!NOTE]
+Conda environments are listed and created but have not been tested.
 
 ## How to use it?
 
 Run the pipeline using the following commands, adjusting the parameters as needed:
 
-*ASSEMBLE*
-```
-nextflow run main.nf --mode assemble --input "/path/to/data/*_{1,2}.fastq.gz" --mrsa <true> -profile <docker/singularity/conda>
-```
-
-*REFERENCE GENOME*
+*REFERENCE GENOME VARIANT CALLING*
 ```
 nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" --personal_ref "/path/to/bacterial_genome.fasta" -profile <docker/singularity/conda>
 ```
 
-*DE NOVO*
+*DE NOVO VARIANT CALLING*
 
 ```
 nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
 ```
 
+*GENOME ASSEMBLY*
+```
+nextflow run main.nf --mode assemble --input "/path/to/data/*_{1,2}.fastq.gz" --mrsa <true> -profile <docker/singularity/conda>
+```
 
-### Parameters
+### Usage and parameters
+```bash
+Usage: nextflow run main.nf [--help] [--mode VAR] [--input VAR] [--short_inputs VAR] [--outdir VAR] [--organism VAR] [--min_length VAR] [--min_mean_q VAR] [--keep_percent VAR] [--plasmid] [--bakta_db_define VAR] [--db_select VAR] [--abricate_db VAR] [-w VAR] [-profile VAR]
 
---mode: Depends on the analysis - assemble/reference/novo.
+Input data arguments
+  --mode                TEXT        Selection of the pipeline assemble/reference/novo [required]
+  --input               PATH        Input FASTQ paired-end files named *_{1,2} (.fastq.gz format) [required]
+  --genome_name_db      TEXT        (--mode novo) Name of the organism/strain to name the SnpEFF database [required]
+  --wildtype_code       TEXT        (--mode novo) Define the sample that will be taken as reference [required]
+  --personal_ref        PATH        (--mode reference) Path to the bacterial reference genome in .fasta file [required]
+  --custom_gff3         PATH        (--mode reference) Path to the annotation .GGF3 file.
 
---input: Path to input FASTQ paired-end files generated by Illumina sequencing (file format: .fastq.gz).
+Nextflow arguments
+  -profile              TEXT        Selection of execution profile (docker, singularity or conda) [required]
+  -w                    PATH        Path to the work dir. where temporary files will be written [default: ./work ]
 
---outdir: Directory where the results will be stored (default: out).
+Output arguments
+  --outdir              PATH        Directory to write the output [default: ./out]
 
--profile: Specifies the execution profile (docker, singularity or conda).
+Optional arguments 
+  --help                            Show this message and exit      
+  --mrsa                BOOLEAN     (--mode assemble) Specific for <Staphylococcus aureus> genome assemblies. Add this parameter to identify the spa Type and SCCmec cassettes [dafault: false]
 
---mrsa (only for --mode assemble): Specific for *Staphylococcus aureus* genome asseblies. It performs the [spaTyper]() and [sccmec]() software analysis (dafault: false).
+Raw reads filtering arguments
+  --cut_front           INTEGER     Move a sliding window from front (5') to tail, drop the bases in the window if its mean quality < threshold, stop otherwise. [default: 15]
+  --cut_tail            INTEGER     Move a sliding window from tail (3') to front, drop the bases in the window if its mean quality < threshold, stop otherwise [default: 20]
+  --cut_mean_quality    INTEGER     The mean quality requirement option shared by cut_front, cut_tail or cut_sliding. Range: 1~36. [default: 20]
+  --length_required     INTEGER     Reads shorter than length_required will be discarded [default: 50]
 
---genome_name_db (only for --mode novo): Name of the organism that will name the database in SnpEFF.
+Filtering parameters
+  --qual_snp            TEXT        One or more expressions used with INFO fields to quality filter SNPs [default "QUAL < 50.0 || MQ < 25.0 || DP < 30"].
+  --qual_indel          TEXT        One or more expressions used with INFO fields to quality filter INDELs [default: "QUAL < 200.0 || MQ < 25.0 || DP < 30"]
 
---wildtype_code (only for --mode novo): Defines the sample that will be taken as reference.
+MLST and AMR arguments
+  --organism         TEXT        To be used by ARIBA to determine the scheme to use to classify the bacterial strain. Also, it will be used by ABRicate. ABRicate searches the following databases: vfdb_full, resfinder, plasmidfinder, and card. If Escherichia coli or Klebsiella pneumoniae is specified, ecoli_vf and argannot will be searched, respectively, instead of vfdb_full [default: ""] [required for mode --assemble] 
 
---personal_ref (only for --mode reference): Path to the bacterial reference genome FASTA file.
-
-
-#### Optional parameters
-
--w: Path to the temporary work directory where files will be stored (default: ./work).
-
-##### Trimming
-
---cut_front: move a sliding window from front (5') to tail, drop the bases in the window if its mean quality < threshold, stop otherwise. Default: 15
-
---cut_tail: move a sliding window from tail (3') to front, drop the bases in the window if its mean quality < threshold, stop otherwise. Default: 20
-
---cut_mean_quality: the mean quality requirement option shared by cut_front, cut_tail or cut_sliding. Range: 1~36 default: 20
-
---length_required: reads shorter than length_required will be discarded. Default: 50.
-
-##### Filter
-
---qual_snp: One or more expressions used with INFO fields to quality filter SNPs. Default "QUAL < 50.0 || MQ < 25.0 || DP < 30".
-
---qual_indel: One or more expressions used with INFO fields to quality filter INDELs. Default: "QUAL < 200.0 || MQ < 25.0 || DP < 30".
-
+Databases arguments
+  --bakta_db_define  PATH        Define the path to the user downloaded database to be used by Bakta. By default the database is downloaded if no argument is added. Another option is to copy-paste the database directly to the "./bakta_db" directory
+  --db_select        TEXT/PATH   Kraken2 database to use for taxonomy classification. The options "db_16GB" or "db_full_60GB" are downloaded automatically if specified. Alternatively, a path to a user-provided database may be supplied. Another option is to copy-paste the database directly into the "./kraken_db" directory [default: "db_16GB"]
+  --abricate_db      PATH        Path to the user downloaded databases to be used by Abricate
+  
 >[!NOTE]
 QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth). More info [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants).
-
-
+```
 
 ## Reference:
 
