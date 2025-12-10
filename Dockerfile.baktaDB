@@ -1,0 +1,32 @@
+FROM continuumio/miniconda3
+
+LABEL authors="JIMM LUCAS" \
+      description="Docker image containing BAKTA software only (Ready for Nextflow DB management)"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Corrección de permisos y dependencias del sistema
+# Corregimos el error de /tmp para apt-get update
+RUN chmod 1777 /tmp && \
+    apt-get update && \
+    apt-get install -y procps wget tar && \
+    apt-get clean
+
+# 2. Instalar entorno Conda
+# Asegúrate de que el archivo envs/bakta_env.yml exista en el mismo directorio del build.
+COPY envs/bakta_env.yml /tmp/bakta_env.yml
+WORKDIR /tmp
+RUN conda env create -f bakta_env.yml && \
+    conda clean -afy
+
+# 3. Configurar PATH
+# Esto es CRÍTICO para que los comandos de bakta y amrfinder estén disponibles
+ENV PATH="/opt/conda/envs/bakta_env/bin:${PATH}"
+
+# 4. Configuración final
+# Creamos la carpeta /data donde trabajará Nextflow
+WORKDIR /data
+
+# IMPORTANTE: NO se descarga la DB aquí. La gestiona Nextflow/BAKTA_SET_DB
+
+CMD ["/bin/bash"]

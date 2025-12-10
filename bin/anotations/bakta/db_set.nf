@@ -12,6 +12,8 @@ process BAKTA_SET_DB {
 
     script:
     """
+    mkdir -p ${params.bakta_db_dir}
+    cd ${params.bakta_db_dir}
 
     export HOME=\$PWD
     
@@ -27,9 +29,6 @@ process BAKTA_SET_DB {
     bakta_db download --type light --output db-light
     
     # update of AMRFinderPlus
-    amrfinder_update --database db-light/amrfinderplus-db --force_update
-
-    chmod -R a+rX db-light || true
-
+    amrfinder_update --database db-light/amrfinderplus-db
     """
 }

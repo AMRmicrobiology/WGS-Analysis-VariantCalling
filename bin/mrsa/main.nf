@@ -1,6 +1,9 @@
 process MRSA {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
 
     publishDir "${params.outdir}/5-MRSA/spaTyper" , mode:"copy"
 
@@ -26,6 +29,10 @@ process MRSA {
 
 process SCCMEC {
     tag "MRSA process SPATYPER-SCCMEC ${sample_id}"
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
 
     publishDir "${params.outdir}/5-MRSA/SCCMEC" , mode: "copy"
     

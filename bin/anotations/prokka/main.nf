@@ -1,5 +1,9 @@
 process PROKKA {
-    tag "PROKKA ANNOTATION"
+    tag "PROKKA annotation for ${sample_id}"
+
+        container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.prokka.docker}" :
+        params.prokka.docker }"
 
     publishDir "${params.outdir}/2-assemble/annotations", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".gff")) {

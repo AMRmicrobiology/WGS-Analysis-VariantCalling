@@ -1,6 +1,10 @@
 process PERSONAL_GENOME_MAPPING {
     tag "Mapping personal ref vs ${sample_id}"
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
+
     cpus 16
 
     publishDir "${params.outdir}/3-prunning", mode: 'copy',

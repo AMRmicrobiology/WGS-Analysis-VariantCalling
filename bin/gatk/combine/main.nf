@@ -1,7 +1,9 @@
 process COMBINE_GVCFS {
     tag "CombineGVCFs"
 
-    container "$params.gatk4.docker"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.gatk4.docker}" :
+        params.gatk4.docker }"
 
     input:
     path gvcf_files

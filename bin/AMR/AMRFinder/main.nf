@@ -1,9 +1,12 @@
 process AMR_2 {
-    tag "AMRFinder PROCESS"
+    tag "AMRFinder search for ${sample_id}"
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.amrfinderplus.docker}" :
+        params.amrfinderplus.docker }"
+
 
     publishDir "${params.outdir}/3-AMR/AMRFinder", mode: 'copy'
-
-    container "$params.amrfinderplus.docker"
 
     input:
     tuple val(sample_id), path(assembly_file)

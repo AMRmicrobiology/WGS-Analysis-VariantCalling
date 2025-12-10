@@ -1,0 +1,14 @@
+name: prokka_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - prokka=1.14.6
+  - perl
+  - blast
+  - barrnap
+  - aragorn
+  - hmmer
+  - tbl2asn-forever
+  - parallel

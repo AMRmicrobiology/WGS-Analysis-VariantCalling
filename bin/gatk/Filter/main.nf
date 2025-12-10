@@ -1,12 +1,14 @@
 process FILTER_VARIANTS {
     tag "Filter Variant ${sample_id}"
     
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.gatk4.docker}" :
+        params.gatk4.docker }"
+
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".vcf.gz")) "4-VCF/filter_VCF/$filename"
         else null
     }
-
-    container "$params.gatk4.docker"
 
     input:
     tuple val (sample_id), path(vcf), val(id_reference), path(reference)

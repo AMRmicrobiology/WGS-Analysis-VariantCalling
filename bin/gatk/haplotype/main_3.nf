@@ -1,12 +1,14 @@
 process HAPLOTYPECALLER {
     tag "Haplotype ${sample_id}"
     
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.gatk4.docker}" :
+        params.gatk4.docker }"
+
     publishDir "${params.outdir}", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".vcf.")) "8-tryVCF/VCF/$filename"
         else null
     }
-
-    container "$params.gatk4.docker"
 
     input:
     tuple val (sample_id), path (bam), val(wt), path (reference)

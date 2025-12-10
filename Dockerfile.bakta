@@ -1,0 +1,25 @@
+FROM continuumio/miniconda3
+
+LABEL authors="JIMM LUCAS" \
+      description="Docker image containing ENV BAKTA"
+
+COPY envs/bakta_env.yml /tmp/bakta_env.yml
+
+WORKDIR /tmp
+
+RUN conda env create -f bakta_env.yml && \
+    conda clean -afy
+
+RUN mkdir -p /data && \
+    wget -O db-light.tar.xz \
+      https://zenodo.org/record/14916843/files/db-light.tar.xz && \
+    tar -xf db-light.tar.xz -C /data/ && \
+    rm db-light.tar.xz
+
+RUN echo "conda activate bakta_env" >> /root/.bashrc
+
+ENV PATH="/opt/conda/envs/bakta_env/bin:${PATH}"
+
+WORKDIR /data
+
+CMD ["/bin/bash"]

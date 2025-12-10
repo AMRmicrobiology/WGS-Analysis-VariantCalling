@@ -1,7 +1,9 @@
 process EXTRACT_CDS_FROM_BAKTA {
     tag "CDS EXTRACTOR for ${sample_id}"
 
-    container "$params.agat.docker"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.agat.docker}" :
+        params.agat.docker }"
 
     input:
     tuple val(sample_id), path(gff3_file), path(fna_file)

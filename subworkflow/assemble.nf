@@ -3,9 +3,18 @@ DSL2 channels
 */
 nextflow.enable.dsl=2
 
-checkInputParams()
+log.info """\
+                  
+              WGS - ASSEMBLY
 
-reference         = file("${params.reference}")
+            P A R A M E T E R S
+==============================================
+Configuration environment:
+    Organism name:             $params.organism
+    Out directory:             $params.outdir
+
+"""
+    .stripIndent()
 
 //Call all the sub-work
 
@@ -34,9 +43,7 @@ include { MLST                                                }     from '../bin
 workflow assemble {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
-    /*
-    amrprocess_output = workflow_amr( preprocess_output.accurance_fasta_ch, preprocess_output.fq_gz_reads_ch, preprocess_output.prune_ch )
-    */
+    amrprocess_output = workflow_amr(preprocess_output.accurance_fasta_ch, preprocess_output.prune_ch )
     postprocess_output = workflow_post_process( preprocess_output.busco_ch, preprocess_output.quast_ch )
     if (params.mrsa) {
         mrsaprocess_output = workflow_mrsa(preprocess_output.accurance_fasta_ch)
@@ -137,29 +144,28 @@ workflow workflow_pre_process {
 
     //MULTIQC
     multiqc_ch = MULTIQC(fastqc_ch_original.qc_zip.collect(), fastq_ch_after.qc_zip.collect())
-    
+
     emit:
-    prune_ch
     accurance_fasta_ch
-    fq_gz_reads_ch
+    prune_ch
     busco_ch
     quast_ch
 }
 
 workflow workflow_amr {
     take:
-    prune_ch
     accurance_fasta_ch
-    fq_gz_reads_ch
+    prune_ch
+    
     
     main:
-    //AMR
+   //AMR
     //AMR1-ABRIcate
     abricate_ch = POST_ANALYSIS_ABRICATE(accurance_fasta_ch, params.organism)
-
+    
     //AMR2-RESFINDER
     resfinder_ch = POST_ANALYSIS_AMRFINDER(accurance_fasta_ch)
-
+   
     //MLST FAST RAW DATA- ARIBA
 
     def organism_schemes_ch = Channel.fromPath('organisms_list.txt')
@@ -175,9 +181,8 @@ workflow workflow_amr {
     
     //MLST
     MLST(accurance_fasta_ch)
-
 }
-
+ 
 workflow workflow_post_process {
 
     take:
@@ -188,7 +193,7 @@ workflow workflow_post_process {
     multiqc_2_ch = POST_MULTIQC(quast_ch.map{ it -> it[1] }.collect(), busco_ch.map{ it -> it[1] }.collect())
 
 }
-/*
+
 workflow workflow_mrsa {
     take:
     accurance_fasta_ch
@@ -200,28 +205,4 @@ workflow workflow_mrsa {
     mrsa_ch = MRSA (accurance_fasta_ch)
     sccmec_ch = SCCMEC(accurance_fasta_ch)
 
-}
-*/
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FUNCTIONS                                                                  //
-////////////////////////////////////////////////////////////////////////////////
-
-
-def checkInputParams() {
-    // Check required parameters and display error messages
-    boolean fatal_error = false
-    if ( ! params.input) {
-        log.warn("You need to provide a fastqDir (--fastqDir) or a bamDir (--bamDir)")
-        fatal_error = true
-    }
-    if ( ! params.reference ) {
-        log.warn("You need to provide a genome reference (--reference)")
-        fatal_error = true
-    }
-    if (! params.personal_ref)  {
-        log.warn("You need to provide a personal genome reference (--personal_ref)")
-        fatal_error = true
-    }
 }

@@ -5,20 +5,22 @@ checkInputParams()
 reference         = file("${params.reference}")
 
 log.info """\
+                  
+        WGS - DE NOVO VARIANT CALLING
 
-WGS - P A R A M E T R E S
+            P A R A M E T E R S
 ==============================================
-Configuration environemnt:
-    Out directory:             $params.outdir
-    Fastq directory:           $params.input
-    Reference directory:       $params.reference
+Configuration environment:
+    Wild-type code:            $params.wildtype_code
     DB SNPeFF name:            $params.genome_name_db
+    Out directory:             $params.outdir
+
 """
     .stripIndent()
 
 //Call all the sub-work
 
-include { BAKTA_SET_DB                                        }     from '../bin/annotation/bakta/db_set'
+include { BAKTA_SET_DB                                        }     from '../bin/anotations/bakta/db_set'
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
 include { TRIMMING                                            }     from '../bin/trimming/main'
 include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin/qc/fastqc/main'

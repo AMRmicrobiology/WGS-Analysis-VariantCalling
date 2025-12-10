@@ -1,9 +1,11 @@
 process SNPEFF {
-
     tag { "SNPEFF_${new_id}" }
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.snpeff.docker}" :
+        params.snpeff.docker }"
+
     publishDir "${params.outdir}/Variant_annotations", mode: 'copy'
-    container "${params.snpeff.docker}"
     
     input:
     tuple(

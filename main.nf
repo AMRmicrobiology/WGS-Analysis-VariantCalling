@@ -1,46 +1,146 @@
-#!/usr/bin/env nextflow
+/*
+  ============================================================
+ __        ______ ____        _                _           _        
+ \ \      / / ___/ ___|      / \   _ __   __ _| |_   _ ___(_)___    
+  \ \ /\ / / |  _\___ \     / _ \ | '_ \ / _` | | | | / __| / __|   
+   \ V  V /| |_| |___) |   / ___ \| | | | (_| | | |_| \__ \ \__ \   
+    \_/\_/  \____|____/   /_/   \_\_| |_|\__,_|_|\__, |___/_|___/   
+ __     __         _             _      ____     |___/_             
+ \ \   / /_ _ _ __(_) __ _ _ __ | |_   / ___|__ _| | (_)_ __   __ _ 
+  \ \ / / _` | '__| |/ _` | '_ \| __| | |   / _` | | | | '_ \ / _` |
+   \ V / (_| | |  | | (_| | | | | |_  | |__| (_| | | | | | | | (_| |
+    \_/ \__,_|_|  |_|\__,_|_| |_|\__|  \____\__,_|_|_|_|_| |_|\__, |
+                                                              |___/
+      N F   P I P E L I N E - WGS_ANALYSIS_VARIANT_CALLING
 
-nextflow.enable.dsl=2
+  Illumina sequencing data WGS/Variant Calling Pipeline - Nextflow
+  ============================================================
 
-// Definir los parámetros con valores predeterminados
-params.mode = params.mode ?: ''
-params.input = params.input ?: ''
-params.reference = params.reference ?: ''
-params.outdir = params.outdir ?: 'results'
+  Author:        Jimmy Lucas and Roger de Pedro Jové
+  Description:   Nextflow pipeline for whole-genome sequencing (WGS)
+                 analysis and variant calling in bacterial genomes 
+                 using Illumina data, supporting de novo assembly and 
+                 reference-based analysis.
+  Version:       1.0.0
 
-// Lista de modos válidos
-def valid_modes = ['novo', 'reference', 'assemble']
+  ============================================================
+*/
 
-// Convertir `--mode` en una lista (por si el usuario pasa varios workflows separados por comas)
-def selected_modes = params.mode.split(',').collect { it.trim() }
+nextflow.enable.dsl = 2
 
-// Verificar si todos los valores pasados en `--mode` son válidos
-if( !selected_modes.every { it in valid_modes } ) {
-    error "Invalid mode(s): '${params.mode}'. Please specify one or more of: 'novo', 'reference', 'assemble'."
+if (params.help) {
+    printHelp()
+    exit 0
 }
 
-// Incluir los sub-workflows desde la carpeta `subworkflow/`
-include { novo } from './subworkflow/novo'
-include { reference } from './subworkflow/reference'
-include { assemble } from './subworkflow/assemble'
+checkInputParams()
 
-workflow {
-    log.info """
-    ==============================================
-            WGS - N F   P I P E L I N E 
-    ==============================================
-    Running mode(s): ${selected_modes.join(', ')}
-    Configuration environemnt:
-    Out directory:             $params.outdir
+reference = file("${params.reference}")
+
+log.info """
+ __        ______ ____        _                _           _        
+ \\ \\      / / ___/ ___|      / \\   _ __   __ _| |_   _ ___(_)___    
+  \\ \\ /\\ / / |  _\\___ \\     / _ \\ | '_ \\ / _` | | | | / __| / __|   
+   \\ V  V /| |_| |___) |   / ___ \\| | | | (_| | | |_| \\__ \\ \\__ \\   
+    \\_/\\_/  \\____|____/   /_/   \\_\\_| |_|\\__,_|_|\\__, |___/_|___/   
+ __     __         _             _      ____     |___/_             
+ \\ \\   / /_ _ _ __(_) __ _ _ __ | |_   / ___|__ _| | (_)_ __   __ _ 
+  \\ \\ / / _` | '__| |/ _` | '_ \\| __| | |   / _` | | | | '_ \\ / _` |
+   \\ V / (_| | |  | | (_| | | | | |_  | |__| (_| | | | | | | | (_| |
+    \\_/ \\__,_|_|  |_|\\__,_|_| |_|\\__|  \\____\\__,_|_|_|_|_| |_|\\__, |
+                                                              |___/ 
+
+==============================================
+N F   P I P E L I N E - WGS_ANALYSIS_VARIANT  
+==============================================
+Configuration environment:
+    Pipeline mode:             $params.mode
     Fastq directory:           $params.input
-    Reference directory:       $params.reference
-    """
+    Profile:                   $workflow.profile
 
-    selected_modes.each { mode ->
-        switch (mode) {
-            case 'novo':      novo(); break
-            case 'reference': reference(); break
-            case 'assemble':  assemble(); break
-        }
+"""
+    .stripIndent()
+
+// Subworkflows 
+
+if (params.mode == 'assemble') {
+    include { assemble } from "$projectDir/subworkflow/assemble" 
+} else if (params.mode == 'reference') {
+    include { reference } from "$projectDir/subworkflow/reference"
+} else if (params.mode == 'novo') {
+    include { novo} from "$projectDir/subworkflow/novo"
+} else {
+    error "Invalid mode: ${params.mode}. Please specify 'assemble' ,'reference' or 'novo'"
+}
+
+// Definir el workflow principal
+workflow {
+    if (params.mode == 'assemble') {
+        assemble()  
+    } else if (params.mode == 'reference') {
+        reference()
+    } else if (params.mode == 'novo') {
+        novo()
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// FUNCTIONS                                                                  //
+////////////////////////////////////////////////////////////////////////////////
+
+def printHelp() {
+    def readmeFile = file("${projectDir}/README.md")
+    def printSection = false
+
+    if (readmeFile.exists()) {
+        log.info "\n"
+        readmeFile.eachLine { line ->
+            // Start printing when we hit the Usage header
+            if (line.contains("Usage: nextflow run main.nf [--help] [--mode VAR] [--input VAR] [--genome_name_db VAR] [--wildtype_code VAR] [--outdir VAR] [--personal_ref VAR] [--custom_gff3 VAR] [--organism VAR] [--cut_front VAR] [--cut_tail VAR] [--cut_mean_quality VAR] [--length_required VAR] [--mrsa] -[-qual_snp VAR] [--qual_indel VAR] [--bakta_db_define VAR] [--db_select VAR] [--abricate_db VAR] [-w VAR] [-profile VAR]")) {
+                printSection = true
+            }
+            // Stop printing when we hit the next major header (Output)
+            if (line.contains("## Output")) {
+                printSection = false
+            }
+            
+            // Print the line if we are inside the section
+            if (printSection) {
+                log.info line
+            }
+        }
+        log.info "\n"
+    } else {
+        log.warn "README.md not found in ${projectDir}"
+    }
+}
+
+def checkInputParams() {
+    // Check required parameters and display error messages
+    boolean fatal_error = false
+
+    if (!params.input) {
+        log.warn("You need to provide a valid input directory with --input")
+        fatal_error = true
+    }
+    if (!params.mode) {
+        log.warn("You need to provide a valid mode with --mode (assemble, novo, reference)")
+        fatal_error = true
+    }
+    if( params.mode == 'reference' && !params.personal_ref ) {
+        log.warn "You need to provide a valid personal reference with --personal_ref when using reference mode"
+        fatal_error = true
+    }
+    if( !['docker','singularity','conda'].contains( workflow.profile ) ) {
+        log.warn "You need to provide a valid profile with -profile (docker, singularity, conda)"
+        fatal_error = true
+    }
+    if( params.mode == 'assemble' && !params.organism ) {
+        log.warn "You need to provide a valid organism with --organism when using assemble mode"
+        fatal_error = true
+    }
+    if (fatal_error) {
+        error "Missing one or more required parameters"
+    }
+    
 }

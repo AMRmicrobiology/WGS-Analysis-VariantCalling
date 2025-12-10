@@ -15,12 +15,13 @@ This repository contains Nextflow-based pipeline for whole-genome sequencing (WG
 
 ## Contents
 - [Pipeline summary](#pipeline-summary)
-    - [Refence genome](#mode---reference-and---novo)
+    - [Reference genome](#mode---reference-and---novo)
     - [*De-novo*](#mode---reference-and---novo)
     - [Genome assembly](#mode---assemble)
 - [Installation](#installation)
 - [How to Use It](#how-to-use-it)
-    - [Parameters](#parameters)
+    - [Usage and Parameters](#usage-and-parameters)
+- [Output](#output)
 - [References](#reference)
 
 
@@ -112,28 +113,28 @@ Run the pipeline using the following commands, adjusting the parameters as neede
 
 *REFERENCE GENOME VARIANT CALLING*
 ```
-nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" --personal_ref "/path/to/bacterial_genome.fasta" -profile <docker/singularity/conda>
+nextflow run main.nf --mode reference --input "/path/to/data/*_{1,2}.fastq.gz" --personal_ref "/path/to/bacterial_genome.fasta" --genome_name_db "Acinetobacter_baumanii_clinical" -profile <docker/singularity/conda>
 ```
 
 *DE NOVO VARIANT CALLING*
 
 ```
-nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db ¨Acinetobacter_baumanii_clinical¨ -profile <docker/singularity/conda>
+nextflow run main.nf --mode novo --input "/path/to/data/*_{1,2}.fastq.gz" --wildtype_code "Pa01WT" --genome_name_db "Acinetobacter_baumanii_clinical" -profile <docker/singularity/conda>
 ```
 
 *GENOME ASSEMBLY*
 ```
-nextflow run main.nf --mode assemble --input "/path/to/data/*_{1,2}.fastq.gz" --mrsa <true> -profile <docker/singularity/conda>
+nextflow run main.nf --mode assemble --input "/path/to/data/*_{1,2}.fastq.gz" --organism "organism name" -profile <docker/singularity/conda>
 ```
 
 ### Usage and parameters
 ```bash
-Usage: nextflow run main.nf [--help] [--mode VAR] [--input VAR] [--short_inputs VAR] [--outdir VAR] [--organism VAR] [--min_length VAR] [--min_mean_q VAR] [--keep_percent VAR] [--plasmid] [--bakta_db_define VAR] [--db_select VAR] [--abricate_db VAR] [-w VAR] [-profile VAR]
+Usage: nextflow run main.nf [--help] [--mode VAR] [--input VAR] [--genome_name_db VAR] [--wildtype_code VAR] [--outdir VAR] [--personal_ref VAR] [--custom_gff3 VAR] [--organism VAR] [--cut_front VAR] [--cut_tail VAR] [--cut_mean_quality VAR] [--length_required VAR] [--mrsa] -[-qual_snp VAR] [--qual_indel VAR] [--bakta_db_define VAR] [--db_select VAR] [--abricate_db VAR] [-w VAR] [-profile VAR]
 
 Input data arguments
   --mode                TEXT        Selection of the pipeline assemble/reference/novo [required]
   --input               PATH        Input FASTQ paired-end files named *_{1,2} (.fastq.gz format) [required]
-  --genome_name_db      TEXT        (--mode novo) Name of the organism/strain to name the SnpEFF database [required]
+  --genome_name_db      TEXT        (--mode novo/reference) Name of the organism/strain to name the SnpEFF database [required]
   --wildtype_code       TEXT        (--mode novo) Define the sample that will be taken as reference [required]
   --personal_ref        PATH        (--mode reference) Path to the bacterial reference genome in .fasta file [required]
   --custom_gff3         PATH        (--mode reference) Path to the annotation .GGF3 file.
@@ -156,20 +157,80 @@ Raw reads filtering arguments
   --length_required     INTEGER     Reads shorter than length_required will be discarded [default: 50]
 
 Filtering parameters
-  --qual_snp            TEXT        One or more expressions used with INFO fields to quality filter SNPs [default "QUAL < 50.0 || MQ < 25.0 || DP < 30"].
-  --qual_indel          TEXT        One or more expressions used with INFO fields to quality filter INDELs [default: "QUAL < 200.0 || MQ < 25.0 || DP < 30"]
+  --snp_filter_expr     TEXT        One or more expressions used with INFO fields to quality filter SNPs [default "QUAL < 50.0 || MQ < 25.0 || DP < 30"].
+  --indel_filter_expr   TEXT        One or more expressions used with INFO fields to quality filter INDELs [default: "QUAL < 200.0 || MQ < 25.0 || DP < 30"]
 
 MLST and AMR arguments
-  --organism         TEXT        To be used by ARIBA to determine the scheme to use to classify the bacterial strain. Also, it will be used by ABRicate. ABRicate searches the following databases: vfdb_full, resfinder, plasmidfinder, and card. If Escherichia coli or Klebsiella pneumoniae is specified, ecoli_vf and argannot will be searched, respectively, instead of vfdb_full [default: ""] [required for mode --assemble] 
+  --organism            TEXT        To be used by ARIBA to determine the scheme to classify the [bacterial strain](./organisms_list.txt). Also, it will be used by ABRicate. ABRicate searches the following databases: vfdb_full, resfinder, plasmidfinder, and card. If Escherichia coli or Klebsiella pneumoniae is specified, ecoli_vf and argannot will be searched, respectively, instead of vfdb_full [default: ""] [required for mode --assemble] 
 
 Databases arguments
-  --bakta_db_define  PATH        Define the path to the user downloaded database to be used by Bakta. By default the database is downloaded if no argument is added. Another option is to copy-paste the database directly to the "./bakta_db" directory
+  --bakta_db         PATH        Define the path to the user downloaded database to be used by Bakta. By default the database is downloaded if no argument is added. Another option is to copy-paste the database directly to the "./bakta_db" directory
   --db_select        TEXT/PATH   Kraken2 database to use for taxonomy classification. The options "db_16GB" or "db_full_60GB" are downloaded automatically if specified. Alternatively, a path to a user-provided database may be supplied. Another option is to copy-paste the database directly into the "./kraken_db" directory [default: "db_16GB"]
   --abricate_db      PATH        Path to the user downloaded databases to be used by Abricate
   
 >[!NOTE]
 QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth). More info [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants).
 ```
+
+## Output
+This is the folder architecture and the content of the output data directories. Outputs can vary depending on the mode selected:
+
+<div style="overflow-x: auto;">
+
+<table>
+    <thead>
+        <tr>
+            <th align="center">Folder</th>
+            <th align="center">Subfolder</th>
+            <th align="center">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="1" align="center"><nobr>1-QC</td>
+            <td align="center"><nobr>fastQC</td>
+            <td align="center">MultiQC report of data quality assessment of all samples</td>
+        </tr>
+        <tr>
+            <td rowspan="4" align="center"><nobr>2-Assembly</td>
+            <td align="center"></td>
+            <td align="center">All final consensus genomes assemblies ("sample_ID"_consensus_wrapped.fasta)</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>1-Fly_structural</td>
+            <td align="center">Nanostats results and Flye output results directories containing the graph files</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>2-Medaka_results</td>
+            <td align="center">Medaka output directories</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>3-Annotations</td>
+            <td align="center">All combined files produced by AGAT from Bakta and Prokka annotation tools are located here. Also, Bakta and Prokka output directories</td>
+        </tr>
+        <tr>
+            <td rowspan="2" align="center"><nobr>3-Prunning</td>
+            <td align="center">ABRICATE</td>
+            <td align="center">ABRICATE search results</td>
+        </tr>
+        <tr>
+            <td align="center">AMRFinder</td>
+            <td align="center">AMRFinder search results</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>4-VCF</td>
+            <td align="center"></td>
+            <td align="center">MLST results</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>Variant annotation</td>
+            <td align="center"></td>
+            <td align="center">MOB-suite plasmid tool output directories</td>
+        </tr>
+    </tbody>
+</table>
+
+</div>
 
 ## Reference:
 

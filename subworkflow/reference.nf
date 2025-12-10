@@ -4,6 +4,19 @@ checkInputParams()
 
 reference         = file("${params.reference}")
 
+log.info """\
+                  
+        WGS - REFERENCE VARIANT CALLING
+
+            P A R A M E T E R S
+==============================================
+Configuration environment:
+    Personal reference:        $params.personal_ref
+    Personal GFF3:             $params.custom_gff3
+    DB SNPeFF name:            $params.genome_name_db
+    Out directory:             $params.outdir
+
+"""
 
 //Call all the sub-work
 include { FASTQC_QUALITY as FASTQC_QUALITY_ORIGINAL           }     from '../bin/qc/fastqc/main'
@@ -12,7 +25,7 @@ include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin
 include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
 include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
-include { BAKTA                                               }     from '../bin/anotations/bakta/main'
+include { BAKTA                                               }     from '../bin/anotations/bakta/main_3'
 include { EXTRACT_CDS_FROM_BAKTA			                  }     from '../bin/anotations/bakta/main_2'
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
@@ -29,17 +42,21 @@ include { SNPEFF			                                  }     from '../bin/snpeff/m
 workflow reference {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
-    
-    postprocess_output = workflow_post_process(preprocess_output.prune_reads_ch)
+    postprocess_output = workflow_post_process(preprocess_output.prune_reads_ch, krakenprocess_output.DB_BAKTA_CH)
     
 }
 
 workflow workflow_kraken_process {
+    //KRAKEN2_db setup
     db_ready_ch = PREPARE_KRAKEN_DB()
     DB_CH= db_ready_ch.db_ready
+    //BAKTA_db setup
+    db_bakta_ready_ch = BAKTA_SET_DB()
+    DB_BAKTA_CH = db_bakta_ready_ch.db_bakta_dir
 
     emit:
     DB_CH
+    DB_BAKTA_CH
 }
 
 workflow workflow_pre_process {
@@ -92,6 +109,7 @@ workflow workflow_post_process {
 
     take:
     prune_reads_ch
+    DB_BAKTA_CH
 
     main:
 
@@ -156,7 +174,7 @@ workflow workflow_post_process {
         gff3_ch = Channel.value(file(params.custom_gff3))
     } else {
         log.info "No custom GFF3 file provided — running BAKTA to generate it from the reference"
-        gff_first_ch = BAKTA(reference_ch)
+        gff_first_ch = BAKTA(reference_ch, DB_BAKTA_CH)
         gff3_ch = gff_first_ch.bakta_gff3
     }
     

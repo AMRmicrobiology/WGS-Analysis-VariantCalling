@@ -1,0 +1,17 @@
+FROM continuumio/miniconda3
+LABEL authors="JIMM LUCAS" \
+      description="Docker image containing ENV BUSCO"
+
+COPY envs/busco.yml /tmp/busco.yml
+
+WORKDIR /tmp
+
+RUN conda env create -f busco.yml
+
+RUN echo "conda activate busco" >> ~/.bashrc
+
+ENV PATH /opt/conda/envs/busco/bin:$PATH
+
+WORKDIR /home
+
+CMD ["/bin/bash"]

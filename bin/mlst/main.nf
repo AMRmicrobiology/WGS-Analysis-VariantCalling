@@ -1,10 +1,11 @@
 process ARIBA {
     tag "ARIBA for ${sample_id} with ${scheme}"
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    "docker://${params.ariba.docker}" :
+    params.ariba.docker }"
+    
     publishDir "${params.outdir}/4-MLST/ARIBA", mode: 'copy'
-    
-    container "$params.ariba.docker"
-    
 
     input:
     tuple val(sample_id), path(trimmed_reads), val(organism), val(scheme)

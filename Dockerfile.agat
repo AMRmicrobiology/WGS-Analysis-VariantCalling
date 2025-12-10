@@ -1,0 +1,36 @@
+FROM continuumio/miniconda3:latest
+
+LABEL maintainer="jimmy_12222@hotmail.com"
+LABEL description="AGAT v1.5.0 + bioinformatics tools (samtools, bedtools, gffread) via conda"
+
+# Establecer el shell por defecto a bash
+SHELL ["/bin/bash", "-c"]
+
+# Configurar canales y crear entorno con todas las herramientas necesarias
+RUN conda config --set channel_priority strict && \
+    conda config --add channels defaults && \
+    conda config --add channels bioconda && \
+    conda config --add channels conda-forge && \
+    conda create -y -n agat_env \
+        agat=1.5.0 \
+        samtools \
+        bedtools \
+        gffread \
+        perl \
+        perl-app-cpanminus \
+        perl-file-sharedir \
+        perl-file-which \
+        perl-test-most && \
+    conda clean -afy
+
+# Activar entorno por defecto al iniciar el contenedor
+RUN echo "conda activate agat_env" >> ~/.bashrc
+
+# Establecer entorno y PATH al cargar el contenedor
+ENV PATH=/opt/conda/envs/agat_env/bin:$PATH
+ENV CONDA_DEFAULT_ENV=agat_env
+
+# Carpeta de trabajo
+WORKDIR /data
+
+CMD [ "bash" ]

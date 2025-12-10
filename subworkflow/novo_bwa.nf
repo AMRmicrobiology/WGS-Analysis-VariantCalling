@@ -42,11 +42,8 @@ include { DECOMPRESS_VCF                                      }     from '../bin
 include { SNPEFF                                              }     from '../bin/snpeff/main'
 include { AMR as POST_ANALYSIS_ABRICATE                       }     from '../bin/AMR/abricate/main'
 include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin/AMR/AMRFinder/main'
-/*
 
 
-
-*/
 workflow novo {
     preprocess_output = workflow_pre_process()
     postprocess_output = workflow_post_process(preprocess_output.personal_ref_ch, preprocess_output.fq_gz_reads_ch)

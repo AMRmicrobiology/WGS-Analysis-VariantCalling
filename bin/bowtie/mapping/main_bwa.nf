@@ -1,6 +1,10 @@
 process PERSONAL_GENOME_MAPPING {
-    tag "Mapping_Assemble_with_ref. ${sample_id}"
+    tag "Mapping assembly with reference for ${sample_id}"
     
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
+
     publishDir "${params.outdir}/3-prunning", mode: 'copy', saveAs: { filename ->
         filename.endsWith(".bam") || filename.endsWith(".bai") ? "Pruning_report/$filename" : null
     }

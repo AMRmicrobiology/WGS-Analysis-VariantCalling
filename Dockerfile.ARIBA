@@ -1,0 +1,47 @@
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+# variable inside the Dockerfiles
+ARG ARIBA_BUILD_DIR=/ariba
+ARG DEPS_DIR=/bioinf-tools
+ARG LOCALE_COUNTRY=en_GB
+
+# fork/branch to ARIBA code with PubMLST fix
+ARG ARIBA_REPO=https://github.com/jimmlucas/ariba.git
+ARG ARIBA_BRANCH=fix-pubmlst-db-error
+
+# 1) fix locales and install git
+RUN mkdir -p /tmp && chmod 1777 /tmp && \
+    apt-get update && \
+    apt-get install -y git locales-all && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV LANG=${LOCALE_COUNTRY}.UTF-8 \
+    LANGUAGE=${LOCALE_COUNTRY}:en
+
+# 2) clone the ARIBA repo
+RUN git clone --branch ${ARIBA_BRANCH} --depth 1 \
+    ${ARIBA_REPO} ${ARIBA_BUILD_DIR}
+
+# 3) copy override file for PubMLST
+COPY rest.pubmlst.org.json /rest.pubmlst.org.json
+
+# 4) install dependencies
+RUN ${ARIBA_BUILD_DIR}/install_dependencies.sh ${DEPS_DIR}
+
+# 5) environment variables
+ENV ARIBA_BOWTIE2=${DEPS_DIR}/bowtie2/bowtie2 \
+    ARIBA_CDHIT=cdhit-est \
+    MPLBACKEND="agg" \
+    PATH=${PATH}:${DEPS_DIR}/SPAdes/bin
+
+# 6) install ARIBA from the cloned code
+RUN cd ${ARIBA_BUILD_DIR} && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install -r requirements.txt && \
+    python3 setup.py clean --all && \
+    python3 setup.py test && \
+    python3 setup.py install && \
+    rm -rf ${ARIBA_BUILD_DIR}
+
+CMD ["ariba"]

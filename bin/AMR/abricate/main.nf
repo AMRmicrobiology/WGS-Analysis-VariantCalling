@@ -1,9 +1,11 @@
 process AMR {
-    tag "ABRICATE PROCESS"
+    tag "ABRICATE search for ${sample_id}"
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.abricate.docker}" :
+        params.abricate.docker }"
 
     publishDir "${params.outdir}/3-AMR/ABRICATE/", mode: 'copy'
-
-    container "$params.abricate.docker"
 
     input:
     tuple val(sample_id), path(assembly_file)

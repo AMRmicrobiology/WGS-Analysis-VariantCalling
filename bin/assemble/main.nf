@@ -1,6 +1,10 @@
 process ASSEMBLE {
-    tag "Spades ${sample_id}"
+    tag "Spades assembly for ${sample_id}"
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
+    
     input:
 
     tuple val (sample_id), path(pair_id)

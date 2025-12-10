@@ -3,6 +3,10 @@ process ALIGMENT_PILON {
   cpus 8
   memory '32 GB'
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
+
   input:
   tuple val(sample_id), path(filtered_fasta), path(reads_clear)
 
@@ -29,10 +33,13 @@ process ALIGMENT_PILON {
 
 process PILON_POLISH {
   tag   "PILON | ${sample_id}"
-  container "$params.pilon.docker"
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.pilon.docker}" :
+        params.pilon.docker }"
+
   cpus 8
   memory '32 GB'
-
 
   publishDir "${params.outdir}/2-Assembly/", mode: 'copy', patterns: ['*.pilon.changes.txt', '${sample_id}.fasta']
 

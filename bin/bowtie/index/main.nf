@@ -1,6 +1,10 @@
 process BUILD_INDEX {
     tag "Index reference genome: ${reference_id.simpleName}"
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.short_wgs.docker}" :
+        params.short_wgs.docker }"
+    
     publishDir "${params.reference}/personal/index", mode: 'copy'
 
     input:

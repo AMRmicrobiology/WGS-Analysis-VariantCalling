@@ -1,7 +1,9 @@
 process BUSCO {
     tag "GENOME COMPLETENESS ${sample_id}"
 
-    container "$params.busco.docker"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.busco.docker}" :
+        params.busco.docker }"
     
     publishDir "${params.outdir}/1-QC/genomeQC/BUSCO", mode: "copy" 
 

@@ -1,0 +1,8 @@
+name: abricate_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - abricate=1.0.1
+  - blast=2.11.0

@@ -1,6 +1,9 @@
 process KRAKENTOOLS_EXCLUDE {
   tag { sample_id }
-  container "${params.kraken_tools.docker}"
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        "docker://${params.kraken_tools.docker}" :
+        params.kraken_tools.docker }"
 
   input:
     tuple val(sample_id), path(reads), path(kraken_out)

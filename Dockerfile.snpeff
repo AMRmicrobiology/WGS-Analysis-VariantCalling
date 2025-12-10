@@ -1,0 +1,19 @@
+FROM continuumio/miniconda3
+
+LABEL authors="JIMM LUCAS" \
+      description="Docker image containing ENV SNPEFF"
+
+COPY envs/snpeff.yml /tmp/snpeff_env.yml
+
+WORKDIR /tmp
+
+RUN conda env create -f snpeff_env.yml && \
+    conda clean -afy
+
+RUN echo "conda activate snpeff_env" >> /root/.bashrc
+
+ENV PATH="/opt/conda/envs/snpeff_env/bin:${PATH}"
+
+WORKDIR /data
+
+CMD ["/bin/bash"]
