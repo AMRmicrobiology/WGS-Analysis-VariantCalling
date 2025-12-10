@@ -167,10 +167,10 @@ Databases arguments
   --bakta_db         PATH        Define the path to the user downloaded database to be used by Bakta. By default the database is downloaded if no argument is added. Another option is to copy-paste the database directly to the "./bakta_db" directory
   --db_select        TEXT/PATH   Kraken2 database to use for taxonomy classification. The options "db_16GB" or "db_full_60GB" are downloaded automatically if specified. Alternatively, a path to a user-provided database may be supplied. Another option is to copy-paste the database directly into the "./kraken_db" directory [default: "db_16GB"]
   --abricate_db      PATH        Path to the user downloaded databases to be used by Abricate
-  
->[!NOTE]
-QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth). More info [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants).
+ 
 ```
+>[!NOTE]
+Regarding GATK quality parameters --> QUAL: A confidence measure of the variant; MQ: Mapping quality; DP: Filtered reads that support each of the reported alleles (depth). More info [here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890471-Hard-filtering-germline-short-variants).
 
 ## Output
 This is the folder architecture and the content of the output data directories. Outputs can vary depending on the mode selected:
