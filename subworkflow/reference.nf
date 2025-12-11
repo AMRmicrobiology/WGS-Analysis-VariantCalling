@@ -25,6 +25,7 @@ include { FASTQC_QUALITY as FASTQC_QUALITY_FINAL              }     from '../bin
 include { PREPARE_KRAKEN_DB                                   }     from '../bin/kraken/prepare_db'
 include { KRAKEN;SEQTK_PRUNE                                  }     from '../bin/kraken/main'
 include { MULTIQC                                             }     from '../bin/qc/multiqc/main'
+include { BAKTA_SET_DB                                        }     from '../bin/anotations/bakta/db_set'
 include { BAKTA                                               }     from '../bin/anotations/bakta/main_3'
 include { EXTRACT_CDS_FROM_BAKTA			                  }     from '../bin/anotations/bakta/main_2'
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
