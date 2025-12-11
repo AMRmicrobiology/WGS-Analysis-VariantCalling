@@ -37,7 +37,7 @@ include { BUSCO                                               }     from '../bin
 include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
-include { AGT                                                 }     from '../bin/anotations/main'
+include { AGT                                                 }     from '../bin/anotations/main_2'
 include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
 include { MARKDUPLICATE                                       }     from '../bin/gatk/picard/markduplicate/main'
 include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
