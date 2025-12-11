@@ -31,7 +31,7 @@ include { ASSEMBLE                                            }     from '../bin
 include { FILTER_CONTIGS                                      }     from '../bin/qc/polish/filter'
 include { ALIGMENT_PILON;PILON_POLISH                         }     from '../bin/qc/polish/main'
 include { PROKKA                                              }     from '../bin/anotations/prokka/main'
-include { BAKTA                                               }     from '../bin/anotations/bakta/main'
+include { BAKTA                                               }     from '../bin/anotations/bakta/main_3'
 include { QUAST                                               }     from '../bin/qc/quast/main'
 include { BUSCO                                               }     from '../bin/qc/busco/main'
 include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
@@ -54,7 +54,8 @@ include { AMR_2 as POST_ANALYSIS_AMRFINDER                    }     from '../bin
 workflow novo {
     krakenprocess_output = workflow_kraken_process()
     preprocess_output = workflow_pre_process(krakenprocess_output.DB_CH)
-    anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch)
+    anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch, 
+        krakenprocess_output.DB_BAKTA_CH)
     mappingprocess_output = workflow_mapping_process( preprocess_output.wildtype_only_ch,
     preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
     anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
@@ -158,12 +159,13 @@ workflow workflow_anotation_process {
 
     take:
     wildtype_only_ch
+    DB_BAKTA_CH
 
     main:
     
     //PROKKA
     prokka_annotation_ch = PROKKA(wildtype_only_ch)
-    bakta_annotation_ch = BAKTA(wildtype_only_ch)
+    bakta_annotation_ch = BAKTA(wildtype_only_ch, DB_BAKTA_CH)
     
     //merge anotations
     agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, wildtype_only_ch)
