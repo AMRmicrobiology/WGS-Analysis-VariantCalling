@@ -34,7 +34,7 @@ process BAKTA {
     """
     OUTPUT_DIR="annotations_${sample_code}"
     
-    bakta --db ${db_directory}/db-light \
+    bakta --db ${db_directory} \
           --threads ${task.cpus} \
           --keep-contig-headers \
           --skip-plot \
