@@ -167,8 +167,12 @@ workflow workflow_anotation_process {
     prokka_annotation_ch = PROKKA(wildtype_only_ch)
     bakta_annotation_ch = BAKTA(wildtype_only_ch, DB_BAKTA_CH)
     
+    agt_input_ch = prokka_annotation_ch.prokka_gff
+            .join(bakta_annotation_ch.bakta_gff3)
+            .join(wildtype_only_ch)
+    
     //merge anotations
-    agt_ch = AGT(prokka_annotation_ch.prokka_gff, bakta_annotation_ch.bakta_gff3, wildtype_only_ch)
+    agt_ch = AGT(agt_input_ch)
 
     agt_gff_input_ch = agt_ch.combine_gff3
     agt_protein_input_ch = agt_ch.protein_fasta
