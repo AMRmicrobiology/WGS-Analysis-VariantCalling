@@ -37,7 +37,7 @@ include { BUSCO                                               }     from '../bin
 include { MULTIQC_2 as POST_MULTIQC                           }     from '../bin/qc/multiqc/main_2' 
 include { BUILD_INDEX_1                                       }     from '../bin/bowtie/index/main_bwa'
 include { BUILD_INDEX as PERSONAL_GENOME_INDEX                }     from '../bin/bowtie/index/main'
-include { AGT                                                 }     from '../bin/anotations/main_2'
+include { AGAT                                                }     from '../bin/anotations/main_2'
 include { PERSONAL_GENOME_MAPPING                             }     from '../bin/bowtie/mapping/main'
 include { MARKDUPLICATE                                       }     from '../bin/gatk/picard/markduplicate/main'
 include { ADDORREPLACE                                        }     from '../bin/gatk/picard/addorreplace/main'
@@ -57,8 +57,8 @@ workflow novo {
     anotationprocess_output = workflow_anotation_process(preprocess_output.wildtype_only_ch, 
         krakenprocess_output.DB_BAKTA_CH)
     mappingprocess_output = workflow_mapping_process( preprocess_output.wildtype_only_ch,
-    preprocess_output.accurance_fasta_ch, anotationprocess_output.agt_cds_input_ch,
-    anotationprocess_output.agt_protein_input_ch, anotationprocess_output.agt_gff_input_ch,
+    preprocess_output.accurance_fasta_ch, anotationprocess_output.agat_cds_input_ch,
+    anotationprocess_output.agat_protein_input_ch, anotationprocess_output.agat_gff_input_ch,
     preprocess_output.personal_index_ch, preprocess_output.prune_reads_ch)
     /*
     amrprocess_output = workflow_amr( preprocess_output.contigs_ch)*/
@@ -167,21 +167,21 @@ workflow workflow_anotation_process {
     prokka_annotation_ch = PROKKA(wildtype_only_ch)
     bakta_annotation_ch = BAKTA(wildtype_only_ch, DB_BAKTA_CH)
     
-    agt_input_ch = prokka_annotation_ch.prokka_gff
+    agat_input_ch = prokka_annotation_ch.prokka_gff
             .join(bakta_annotation_ch.bakta_gff3)
             .join(wildtype_only_ch)
     
     //merge anotations
-    agt_ch = AGT(agt_input_ch)
+    agat_ch = AGAT(agat_input_ch)
 
-    agt_gff_input_ch = agt_ch.combine_gff3
-    agt_protein_input_ch = agt_ch.protein_fasta
-    agt_cds_input_ch = agt_ch.cds_fasta
+    agat_gff_input_ch = agat_ch.combine_gff3
+    agat_protein_input_ch = agat_ch.protein_fasta
+    agat_cds_input_ch = agat_ch.cds_fasta
 
     emit:
-    agt_cds_input_ch
-    agt_protein_input_ch
-    agt_gff_input_ch
+    agat_cds_input_ch
+    agat_protein_input_ch
+    agat_gff_input_ch
 }
 
 workflow workflow_mapping_process {
@@ -189,9 +189,9 @@ workflow workflow_mapping_process {
     take:
     wildtype_only_ch
     accurance_fasta_ch
-    agt_cds_input_ch
-    agt_protein_input_ch
-    agt_gff_input_ch
+    agat_cds_input_ch
+    agat_protein_input_ch
+    agat_gff_input_ch
     personal_index_ch
     prune_reads_ch
 
@@ -245,9 +245,9 @@ workflow workflow_mapping_process {
     //SNPeFF
     //Funcional anotations
     snpeff_config_ch = wildtype_only_ch
-        .combine(agt_gff_input_ch)
-        .combine(agt_protein_input_ch)
-        .combine(agt_cds_input_ch)
+        .combine(agat_gff_input_ch)
+        .combine(agat_protein_input_ch)
+        .combine(agat_cds_input_ch)
 
     snpeff_input_ch = vcf_ch.combine(snpeff_config_ch)
 

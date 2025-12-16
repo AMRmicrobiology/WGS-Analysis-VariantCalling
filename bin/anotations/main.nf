@@ -1,4 +1,4 @@
-process AGT {
+process AGAT {
     tag "Merging annotations with AGAT for ${sample_id}"
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
