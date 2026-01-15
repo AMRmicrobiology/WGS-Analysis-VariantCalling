@@ -28,3 +28,4 @@ data/out*
 .nfs*
 kraken_db/*
 DVT_trace.txt
+bakta_db/db-light/

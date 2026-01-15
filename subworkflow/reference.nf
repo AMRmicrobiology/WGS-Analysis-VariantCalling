@@ -176,16 +176,15 @@ workflow workflow_post_process {
     } else {
         log.info "No custom GFF3 file provided — running BAKTA to generate it from the reference"
         gff_first_ch = BAKTA(reference_ch, DB_BAKTA_CH)
-        gff3_ch = gff_first_ch.bakta_gff3
+        gff3_ch = gff_first_ch.bakta_gff3_path
     }
     
     // Combine channels for SNPEFF
     vcf_gff_combined_ch = vcf_ch.combine(gff3_ch)
     vcf_gff_ref_combined_ch = vcf_gff_combined_ch.combine(reference_ch)
 
-    snpeff_input_ch = vcf_gff_ref_combined_ch.map { entry ->
-        def (sample_id, vcf_path, gff3_path, ref_id, ref_fasta) = entry
-        return tuple(
+    snpeff_input_ch = vcf_gff_ref_combined_ch.map {sample_id, vcf_path, gff3_path, ref_id, ref_fasta ->
+         tuple(
             gff3_path,
             ref_id,
             ref_fasta,
@@ -194,9 +193,9 @@ workflow workflow_post_process {
             vcf_path
         )
     }
-
+ 
     snpeff_ch = SNPEFF(snpeff_input_ch)
-      
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

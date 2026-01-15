@@ -24,6 +24,7 @@ process BAKTA {
 
     output:
     tuple val(sample_code), path("annotations_${sample_code}/${sample_code}_consensus_wrapped.gff3"), emit: bakta_gff3
+    path("annotations_${sample_code}/${sample_code}_consensus_wrapped.gff3"), emit: bakta_gff3_path
     path "annotations_${sample_code}/${sample_code}_consensus_wrapped.faa", emit: bakta_faa
     path "annotations_${sample_code}/${sample_code}_consensus_wrapped.ffn", emit: bakta_ffn
     path "annotations_${sample_code}/${sample_code}_consensus_wrapped.gbff", emit: bakta_gbff
