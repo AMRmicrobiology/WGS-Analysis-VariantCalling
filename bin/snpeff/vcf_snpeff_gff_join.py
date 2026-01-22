@@ -14,7 +14,7 @@ def parse_args():
 
 
 def load_gff(gff_path):
-    """Carga el GFF en memoria e indexa por múltiples claves (ID, locus_tag, Parent)."""
+    """Carga el GFF en memoria con priorización de Name > product > prokka_product."""
     genes = []
 
     with open(gff_path) as f:
@@ -35,6 +35,12 @@ def load_gff(gff_path):
                     k, v = a.split("=", 1)
                     attrs[k] = v
 
+            # PRIORIDAD: Name > product > prokka_product
+            best_product = attrs.get("Name", attrs.get("product", attrs.get("prokka_product", ".")))
+            
+            # PRIORIDAD: gene > prokka_gene
+            best_gene = attrs.get("gene", attrs.get("prokka_gene", "."))
+
             entry = {
                 "chrom": chrom,
                 "start": int(start),
@@ -42,11 +48,10 @@ def load_gff(gff_path):
                 "strand": strand,
                 "ID": attrs.get("ID", ""),
                 "locus_tag": attrs.get("locus_tag", ""),
-                "parent": attrs.get("Parent", ""),
+                "gene": best_gene,
+                "product": best_product,
                 "prokka_gene": attrs.get("prokka_gene", "."),
-                "prokka_product": attrs.get("prokka_product", "."),
-                "product": attrs.get("product", "."),
-                "gene": attrs.get("gene", ".")
+                "prokka_product": attrs.get("prokka_product", ".")
             }
 
             genes.append(entry)
@@ -94,6 +99,15 @@ def find_neighbors(genes, chrom, pos):
     return closest, left, right, d_left, d_right
 
 
+def find_overlapping_gene(genes, chrom, pos):
+    """Busca si la variante cae DENTRO de un gen."""
+    pos = int(pos)
+    for g in genes:
+        if g["chrom"] == chrom and g["start"] <= pos <= g["end"]:
+            return g
+    return None
+
+
 def main():
     args = parse_args()
 
@@ -121,7 +135,7 @@ def main():
     header = [
         "CHROM", "POS", "REF", "ALT", "QUAL", "FILTER",
         "Gene_Name", "Gene_ID", "IMPACT", "Effect", "HGVSc", "HGVSp",
-        "prokka_gene", "prokka_product", "locus_tag",
+        "gene_name", "gene_product", "locus_tag",
         "closest_gene", "closest_product", "closest_locus", "distance_closest",
         "left_gene", "left_product", "left_locus", "left_distance",
         "right_gene", "right_product", "right_locus", "right_distance",
@@ -137,7 +151,7 @@ def main():
 
     # Header Reporte Humano
     out_report.write("=" * 80 + "\n")
-    out_report.write("REPORTE DE ANOTACIÓN DE VARIANTES \n")
+    out_report.write("REPORTE DE ANOTACIÓN DE VARIANTES\n")
     out_report.write(f"VCF: {os.path.basename(args.vcf)}\n")
     out_report.write(f"GFF: {os.path.basename(args.gff)}\n")
     out_report.write("=" * 80 + "\n\n")
@@ -176,31 +190,35 @@ def main():
                 gene_name = gene_id = effect = impact = hgvsc = hgvsp = "."
 
             # ============================
-            # MATCH DIRECTO GFF POR ID
+            # BUSCAR GEN AFECTADO (MATCH DIRECTO)
             # ============================
+            # Primero buscar por ID exacto
             match = None
             for g in genes:
                 if gene_id == g["ID"] or gene_name == g["locus_tag"] or gene_name == g["gene"]:
                     match = g
                     break
+            
+            # Si no hay match por ID, buscar si la variante cae dentro de un gen
+            if not match:
+                match = find_overlapping_gene(genes, chrom, pos)
 
             if match:
-                p_gene = match["prokka_gene"]
-                p_prod = match["prokka_product"]
+                p_gene = match["gene"]
+                p_prod = match["product"]
                 p_locus = match["locus_tag"]
             else:
                 p_gene = p_prod = p_locus = "."
 
             # ============================
-            # OPCIONES B + C + D
+            # OPCIONES B + C + D (VECINOS)
             # ============================
-
             closest, left, right, d_left, d_right = find_neighbors(genes, chrom, pos)
 
             # closest
             if closest:
-                closest_gene = closest["prokka_gene"] if closest["prokka_gene"] != "." else closest["gene"]
-                closest_product = closest["prokka_product"] if closest["prokka_product"] != "." else closest["product"]
+                closest_gene = closest["gene"]
+                closest_product = closest["product"]
                 closest_locus = closest["locus_tag"]
                 dist_closest = d_left if left == closest else d_right
             else:
@@ -208,8 +226,8 @@ def main():
 
             # left
             if left:
-                left_gene = left["prokka_gene"] if left["prokka_gene"] != "." else left["gene"]
-                left_prod = left["prokka_product"] if left["prokka_product"] != "." else left["product"]
+                left_gene = left["gene"]
+                left_prod = left["product"]
                 left_loc = left["locus_tag"]
                 left_dist = d_left
             else:
@@ -217,8 +235,8 @@ def main():
 
             # right
             if right:
-                right_gene = right["prokka_gene"] if right["prokka_gene"] != "." else right["gene"]
-                right_prod = right["prokka_product"] if right["prokka_product"] != "." else right["product"]
+                right_gene = right["gene"]
+                right_prod = right["product"]
                 right_loc = right["locus_tag"]
                 right_dist = d_right
             else:
@@ -252,6 +270,11 @@ def main():
             out_report.write(f"  HGVS.c: {hgvsc}\n")
             out_report.write(f"  HGVS.p: {hgvsp}\n")
             out_report.write(f"  SnpEff Gene: {gene_name} ({gene_id})\n")
+            
+            # Si hay match directo, mostrar info del gen afectado
+            if match:
+                out_report.write(f"  ✓ GEN AFECTADO: {p_gene} | {p_prod} | {p_locus}\n")
+            
             out_report.write("-" * 80 + "\n")
 
             out_report.write(f"closest_gene_name:         {closest_gene}\n")
