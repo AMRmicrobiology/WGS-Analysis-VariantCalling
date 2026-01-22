@@ -137,7 +137,7 @@ def main():
 
     # Header Reporte Humano
     out_report.write("=" * 80 + "\n")
-    out_report.write("REPORTE DE ANOTACIÓN DE VARIANTES (FORMATO HUMANO LEGIBLE)\n")
+    out_report.write("REPORTE DE ANOTACIÓN DE VARIANTES \n")
     out_report.write(f"VCF: {os.path.basename(args.vcf)}\n")
     out_report.write(f"GFF: {os.path.basename(args.gff)}\n")
     out_report.write("=" * 80 + "\n\n")
