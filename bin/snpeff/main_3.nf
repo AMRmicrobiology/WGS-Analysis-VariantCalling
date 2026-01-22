@@ -18,6 +18,7 @@ process SNPEFF {
     )
 
     output:
+    tuple val(new_id), path("annotated_${new_id}_variants.vcf"), emit: annotated_vcf_tuple
     path("annotated_${new_id}_variants.vcf"), emit: annotated_vcf
 
     script:

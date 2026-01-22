@@ -39,6 +39,7 @@ include { ALIGN as NORMALISE_DATA                             }     from '../bin
 include { FILTER_VARIANTS as FILTER_VARIANTS_PARAM            }     from '../bin/gatk/Filter/main'
 include { DECOMPRESS_VCF                                      }     from '../bin/snpeff/main_2'
 include { SNPEFF			                                  }     from '../bin/snpeff/main_3'
+include {JOIN_SNPEFF_GFF                                      }     from '../bin/snpeff/main_enrichmed'
 
 workflow reference {
     krakenprocess_output = workflow_kraken_process()
@@ -195,6 +196,8 @@ workflow workflow_post_process {
     }
  
     snpeff_ch = SNPEFF(snpeff_input_ch)
+
+    enrichment_ch= JOIN_SNPEFF_GFF(snpeff_ch.annotated_vcf_tuple, gff3_ch)
 
 }
 
