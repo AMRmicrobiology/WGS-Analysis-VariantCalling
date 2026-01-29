@@ -5,7 +5,7 @@ process PROKKA {
         "docker://${params.prokka.docker}" :
         params.prokka.docker }"
 
-    publishDir "${params.outdir}/2-assemble/annotations", mode: 'copy', saveAs: { filename ->
+    publishDir "${params.outdir}/2-assemble/3-annotations", mode: 'copy', saveAs: { filename ->
         if (filename.endsWith(".gff")) {
             return "prokka/${sample_id}/${sample_id}.gff"
         } else if (filename.endsWith(".faa")) {
@@ -18,10 +18,11 @@ process PROKKA {
     }
 
     input:
-    tuple val (sample_id), path(assembly_file)
+    tuple val(sample_id), path(assembly_file)
 
     output:
     path "annotations_${sample_id}/${sample_id}.gff", emit: prokka_gff
+    tuple val(sample_id), path "annotations_${sample_id}/${sample_id}.gff", emit: prokka_tuple_gff
     path "annotations_${sample_id}/${sample_id}.faa", emit: prokka_faa
     path "annotations_${sample_id}/${sample_id}.fna", emit: prokka_fna
 
