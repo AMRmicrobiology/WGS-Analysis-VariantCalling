@@ -6,17 +6,17 @@
 [![license-shield]][license-url]
 
 ## Introduction
-This repository contains Nextflow-based pipeline for whole-genome sequencing (WGS) analysis and genetic variant calling, specifically optimized for **Illumina sequencing** data from bacterial genomes. It is designed to provide an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
+This repository contains Nextflow-based pipeline for whole-genome sequencing (WGS) data analysis and genetic variant calling, specifically optimized for short-read **Illumina sequencing** data from bacterial genomes. It is designed to provide an automated, reproducible, and scalable solution for processing large-scale genomic data in clinical microbiology research.
 
 
-![Current pipeline of the project](PipelineCP_V2.0.png)
+![Current pipeline of the project](PipelineCP_V3.0.png)
 
 
 
 ## Contents
 - [Pipeline summary](#pipeline-summary)
-    - [Reference genome](#mode---reference-and---novo)
-    - [*De-novo*](#mode---reference-and---novo)
+    - [Reference genome](#mode---reference--mode---novo)
+    - [*De-novo*](#mode---reference--mode---novo)
     - [Genome assembly](#mode---assemble)
 - [Installation](#installation)
 - [How to Use It](#how-to-use-it)
@@ -34,18 +34,18 @@ All modes in the pipeline include the following steps:
 
 2. **Contaminant sequence removal**: The taxonomic sequence classifier [Kraken2](https://github.com/DerrickWood/kraken2) is used to identify contaminant non-bacterial reads followed by [SEQTK](https://github.com/lh3/seqtk) to filter out all reads flagged as contaminants.
 
-At this stage, the pipeline offers three modes, which differ based on the expected output **—Variant Calling** or **Genome Assembly—** and the type of input data:
-- For **Variant Calling**, the analysis can be performed using either
-    -  a [*de novo*](#mode---reference-and---novo) assembled reference strain (--mode novo) or,
-    - an existing [reference genome](#mode---reference-and---novo) (--mode reference). 
-- A shorter version of the pipeline is available to solely perform [genome assembly](#mode---assemble) (--mode assemble). 
+At this stage, the pipeline offers three modes, which differ based on the expected output —**Variant Calling** or **Genome Assembly**—, and the type of input data:
+- For **Variant Calling**, the analysis can be performed using either:
+    -  a [*de novo*](#mode---reference--mode---novo) assembled reference strain (--mode novo) or,
+    - an existing [reference genome](#mode---reference--mode---novo) (--mode reference). 
+- A shorter version of the pipeline is available to only perform [genome assembly](#mode---assemble) (--mode assemble). 
 ___
 
 In both **genome assembly** (--mode assemble) and ***de novo* Variant Calling** (--mode novo), raw reads are initially assembled into a genome following the following steps:
 
 1. **Assembly**: Filtered reads are *de novo* assembled using [SPAdes](https://github.com/ablab/spades).
 2. **Genome QC**: Structural quality metrics are evaluated with [QUAST](https://quast.sourceforge.net/), and genome completeness is assessed using [BUSCO](https://busco.ezlab.org/). A final combined report is generated with [MultiQC](https://github.com/MultiQC/MultiQC).
-3.   **Annotation**:  Genome annotation is performed using both [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta). The resulting GFF annotation files from both annotation tools are cleaned and combined using [AGAT](https://github.com/NBISweden/AGAT).
+3.   **Annotation**:  Genome annotation is performed using both [Prokka](https://github.com/tseemann/prokka) and [Bakta](https://github.com/oschwengers/bakta). The resulting GFF annotation files from both annotation tools are cleaned and combined.
 4. **Mass screening of contigs for antimicrobial resistance and virulence genes** using [ABRIcate](https://github.com/tseemann/abricate) and **identification of antimicrobial resistance genes and point mutations** in protein and/or assembled nucleotide sequences using [AMRFinder](https://github.com/ncbi/amr).
 ---
 After the assembly process, the Variant Calling analysis and the genome assembly mode diverge in their subsequent steps.
@@ -54,7 +54,7 @@ After the assembly process, the Variant Calling analysis and the genome assembly
  ***Reference and De-novo Variant Calling***    
 Once a reference genome is provided —either *de novo* assembled or an existing reference— the pipeline follows the same steps for both modes:
 
-1. **Alignment**: Reads are aligned to the selected reference genome using [BWA-MEM](https://github.com/bwa-mem2/bwa-mem2), and the resulting alignments are then processed with [Samtools](https://github.com/samtools/samtools).
+1. **Alignment**: Reads are aligned to the selected reference genome using [Bowtie2](https://github.com/BenLangmead/bowtie2), and the resulting alignments are then processed with [Samtools](https://github.com/samtools/samtools).
 2. **Variant calling and filtering**: Several steps are performed to identify, filter and annotate genomic variants.
      * **Variant Identification**: Detection of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels) using [PicardTools](https://broadinstitute.github.io/picard/), [GATK](https://github.com/broadinstitute/gatk) and/or [FreeBayes](https://github.com/freebayes/freebayes).
     *  **Variant Filtering**: Filters are applied to obtain high-confidence variant calls ([*see Parameters*](#parameters)).
@@ -66,8 +66,8 @@ Once a reference genome is provided —either *de novo* assembled or an existing
 For the --mode assemble, a simplified pipeline is executed:
  * MLST analysis: 
     - A fast MLST analysis is performed using raw FASTQ reads with [ARIBA](https://github.com/sanger-pathogens/ariba) 
-    - A slow MLST analysis is performed on the assembled genome using [MLST](https://github.com/tseemann/mlst). 
- * *Staphylococcus aureus*: In case --mrsa is added in the command line, the [spaTyper](https://github.com/HCGB-IGTP/spaTyper) and [sccmec](https://github.com/rpetit3/sccmec) tools are used to identifying the spa type and the SCCmec cassettes.
+    - A "slow" MLST analysis is performed on the assembled genome using [MLST](https://github.com/tseemann/mlst). 
+ * *Staphylococcus aureus*: In case --mrsa parameter is added in the command line, the [spaTyper](https://github.com/HCGB-IGTP/spaTyper) and [sccmec](https://github.com/rpetit3/sccmec) tools are used to identifying the spa type and the SCCmec cassettes.
 
  >[!NOTE] 
  The pipeline includes an script to download the reads from DB using an Acc_List.txt<br>
@@ -96,13 +96,6 @@ SINGULARITY_TMPDIR=/PATH/singularity/tmp
 SINGULARITY_CACHEDIR=/PATH/singularity/cache
 TMPDIR=/PATH/singularity/tmp
 export NFX_SINGULARITY_CACHEDIR =/PATH/singularity/tmp
-```
-e.g:
-```
-SINGULARITY_TMPDIR=/mnt/dades/singularity/tmp
-SINGULARITY_CACHEDIR=/mnt/dades/singularity/tmp
-TMPDIR=/mnt/dades/singularity/tmp
-export NFX_SINGULARITY_CACHEDIR=/mnt/dades/singularity/tmp
 ```
 >[!NOTE]
 Conda environments are listed and created but have not been tested.
@@ -192,24 +185,16 @@ This is the folder architecture and the content of the output data directories. 
             <td align="center">MultiQC report of data quality assessment of all samples</td>
         </tr>
         <tr>
-            <td rowspan="4" align="center"><nobr>2-Assembly</td>
+            <td rowspan="2" align="center"><nobr>2-Assembly</td>
             <td align="center"></td>
-            <td align="center">All final consensus genomes assemblies ("sample_ID"_consensus_wrapped.fasta)</td>
-        </tr>
-        <tr>
-            <td align="center"><nobr>1-Fly_structural</td>
-            <td align="center">Nanostats results and Flye output results directories containing the graph files</td>
-        </tr>
-        <tr>
-            <td align="center"><nobr>2-Medaka_results</td>
-            <td align="center">Medaka output directories</td>
+            <td align="center">All final consensus genomes assemblies</td>
         </tr>
         <tr>
             <td align="center"><nobr>3-Annotations</td>
-            <td align="center">All combined files produced by AGAT from Bakta and Prokka annotation tools are located here. Also, Bakta and Prokka output directories</td>
+            <td align="center">Bakta and Prokka output directories. Also, the combined annotation files</td>
         </tr>
         <tr>
-            <td rowspan="2" align="center"><nobr>3-Prunning</td>
+            <td rowspan="2" align="center"><nobr>3-AMR</td>
             <td align="center">ABRICATE</td>
             <td align="center">ABRICATE search results</td>
         </tr>
@@ -218,14 +203,24 @@ This is the folder architecture and the content of the output data directories. 
             <td align="center">AMRFinder search results</td>
         </tr>
         <tr>
-            <td align="center"><nobr>4-VCF</td>
+            <td align="center"><nobr>3-prunning</td>
             <td align="center"></td>
-            <td align="center">MLST results</td>
+            <td align="center">Pruning reports</td>
         </tr>
         <tr>
-            <td align="center"><nobr>Variant annotation</td>
+            <td align="center"><nobr>4-VCF</td>
             <td align="center"></td>
-            <td align="center">MOB-suite plasmid tool output directories</td>
+            <td align="center">VCF results before annotation</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>Variant_annotations</td>
+            <td align="center"></td>
+            <td align="center">Annotated VCFs</td>
+        </tr>
+        <tr>
+            <td align="center"><nobr>Variant_annotations_enriched</td>
+            <td align="center"></td>
+            <td align="center">Annotated VCFs with more information and curated files</td>
         </tr>
     </tbody>
 </table>
